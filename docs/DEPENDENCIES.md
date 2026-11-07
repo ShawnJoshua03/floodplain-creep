@@ -12,6 +12,8 @@ Every declared dependency has one line: `- `name`: reason`. A check compares thi
 - `deptry`: unused and missing dependency finder.
 
 ## Frontend
+Styling is plain CSS Modules plus `web/src/styles/tokens.css`. It adds no dependency. See DESIGN_RULES.md.
+
 - `react`: UI components.
 - `react-dom`: renders React in the browser.
 - `vite`: dev server and build.

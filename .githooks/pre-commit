@@ -4,3 +4,4 @@ set -e
 uv run ruff check .
 uv run ruff format --check .
 uv run python scripts/check_repo_rules.py
+uv run python scripts/check_design_rules.py

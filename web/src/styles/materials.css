@@ -1,0 +1,16 @@
+.chrome {
+  background: var(--chrome-bg);
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  .chrome {
+    backdrop-filter: blur(var(--blur-chrome));
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .chrome {
+    background: var(--bg);
+    backdrop-filter: none;
+  }
+}

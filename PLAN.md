@@ -1,6 +1,6 @@
 # PLAN.md: Floodplain Creep
 
-Read CLAUDE.md and CODE_RULES.md first. Items marked HUMAN need the person. Everything else
+Read CLAUDE.md, CODE_RULES.md, and DESIGN_RULES.md first. Items marked HUMAN need the person. Everything else
 is for Claude Code. Do the milestones in order. At every GATE: run `make check`, print the
 health report from CODE_RULES.md section 7, report results, and wait for the human.
 
@@ -39,11 +39,19 @@ Build the guardrails before any feature code.
   - every dependency in `pyproject` or `package.json` appears in `docs/DEPENDENCIES.md`, and
     the reverse,
   - `TODO` comments must match `TODO(M<number>)`.
-- Add a pre-commit hook that runs ruff and `scripts/check_repo_rules.py`.
+- Add a pre-commit hook that runs ruff, `scripts/check_repo_rules.py`, and
+  `scripts/check_design_rules.py`.
+- Confirm `make design-check` runs. The checker and its tests already exist in `scripts/` and
+  `tests/`. Install nothing for design. In `docs/DEPENDENCIES.md`, record that styling is plain
+  CSS Modules plus tokens.
+- Create `web/src/styles/` with empty-but-valid `tokens.css`, `base.css`, `materials.css`, and
+  `motion.css` so the design checker's required-feature checks pass from the start.
 - Prove the guardrails work. For each rule family, add a scratch violation, confirm `make check`
   fails for the right reason, then remove it. Rule families: god file length, type escape,
   silent catch, unused import, unused parameter, conversational comment, banned package,
-  `.then()` chain, direct DOM lookup, banned word in copy.
+  `.then()` chain, direct DOM lookup, banned word in copy, and for design: a hex color outside
+  the token file, a gradient, a raw pixel length, an emoji, an inline style, and a banned
+  design package.
 
 Known behaviors of the existing checker, so you do not trip them:
 - It scans `api`, `pipeline`, `web/src`, `scripts`, and `tests` for source files only. Text
@@ -53,6 +61,9 @@ Known behaviors of the existing checker, so you do not trip them:
   exempt.
 - Avoid prose comments that contain a colon followed by the word "any". The type escape
   pattern will flag it.
+- The design checker scans `web/src` styles and components. Color literals are allowed only in
+  `tokens.css`. Raw lengths are allowed only in `tokens.css`, except one-pixel hairlines.
+  Avoid element ids that look like hex codes. Marketing words are flagged outside tests.
 
 GATE M0: `make check` passes on the skeleton, and the scratch-violation proof is shown.
 
@@ -154,31 +165,103 @@ Follow the layers in CODE_RULES.md. All handlers are plain `def`.
 GATE M5: show example responses for one normal and one suppressed neighborhood. Show that
 `make types` produces no diff.
 
-## M6. Frontend
+## M6. Frontend (Apple-style interface)
 
-Follow the layers and state rules in CODE_RULES.md section 5.
+Follow DESIGN_RULES.md for every visual choice, and CODE_RULES.md section 5 for state and data
+flow. If anything here conflicts with DESIGN_RULES.md, DESIGN_RULES.md wins.
 
-- `web/src/api/`: the fetch client, TanStack Query hooks, and generated types.
+HUMAN: save screenshots of the approved mockup into `docs/design-reference/` so the target look
+is in the repo.
+
+### M6a. Design foundation (before any feature)
+
+- `web/src/styles/tokens.css`: every token from DESIGN_RULES.md section 3, with light and dark
+  values. `base.css`: reset, body, tabular numerals, and the `:focus-visible` ring.
+  `materials.css`: the chrome material with solid fallbacks for browsers without blur and for
+  reduced transparency. `motion.css`: reduced-motion handling.
+- A contrast test over `tokens.css`. It reads the file, computes the contrast ratio for every
+  listed text, icon, and control pair in both modes, and fails below 4.5 to 1 for text or 3 to 1
+  for icons and control edges. Tune the token values until it passes.
+- `web/src/components/icons/`: play, pause, chevron, info, check, and close, as inline SVG
+  components. Colors come from CSS classes.
+- Primitives in `web/src/components/`, each with a CSS Module and tests: Sheet, NavStack,
+  LargeTitle, SegmentedControl, GroupedList with Row, SwitchRow, Scrubber, Dialog, and
+  InlineMessage. Primitives take props and render. They never fetch data.
+- Tests cover keyboard use and names: arrow keys move through the SegmentedControl, Escape closes
+  the Dialog and returns focus, NavStack moves focus to the new title, and every control has an
+  accessible name.
+
+Acceptance: `make check` passes, and no component uses a raw color or length.
+
+GATE M6a: show the contrast test output and a list of the primitives with their props.
+
+### M6b. Data layer
+
+- `web/src/api/`: the fetch client, TanStack Query hooks, and generated types. Components never
+  call `fetch`.
 - `web/src/state/SelectionProvider.tsx`: `year`, `returnPeriod`, `neighborhoodId`, `overlayOn`.
-- `web/src/features/map/MapView.tsx`: the only file that uses the map library's imperative
-  API, through refs. Neighborhood choropleth of exposed buildings.
-- `features/timelapse/`: year slider with play. `features/scenario/`: return period buttons.
-- Depth overlay toggle with a legend and a human-height silhouette (about 1.7 m) that shows
-  where each depth bin sits on a person. Label depths as modeled and approximate.
-- City counter: "new buildings in the modeled flood zone since 2016" for the chosen scenario.
-- Ranked neighborhood list, also available as plain text. Suppressed neighborhoods show
-  "not enough data."
-- `features/validation/`: accuracy card with sample size and sampling method.
-- `features/brief/`: the neighborhood brief, with a note on how it was checked.
-- `features/limits/`: honesty panel and misuse notice from `/limits`, linked from every screen.
-- Every data-driven component renders loading, error, and empty states, each with a test.
-  Add a test where the selection changes quickly with a slow mocked response and the latest
-  selection wins.
-- Accessibility: keyboard use, readable contrast, and alt text for the map summary.
 
-Acceptance: all screens work against the real API. `make check` passes.
+### M6c. Map and shell
 
-GATE M6: walk the demo script and list anything that fails.
+- `features/map/MapView.tsx` is the only file that uses the map library's imperative API, through
+  refs. It fills the viewport. A small `readPalette.ts` reads colors from the CSS variables at
+  runtime and refreshes them when the color scheme changes. Draw the exposure choropleth,
+  one-pixel separators, a two-pixel accent outline for the selection, a dashed style for
+  suppressed neighborhoods, and the depth overlay image. No text layers on the map. Show the
+  neighborhood name in a small material label on hover or selection. Year changes cross-fade.
+- `features/sheet/`: the Sheet with a root view and a NavStack. It owns the navigation stack in a
+  local reducer. Selecting a neighborhood on the map or in the list pushes its detail view. The
+  back button clears the selection.
+- Root view, in this order:
+  1. Large title "Floodplain Creep" with the city as a subtitle.
+  2. SegmentedControl for the scenario: 10, 50, 100, and 500-year.
+  3. A summary block: the label "New buildings in the modeled flood zone since 2016" and the
+     number, set in the title size. No card around it.
+  4. A SwitchRow "Show flood depth". When on, a depth key row shows the four depth bins beside
+     a 1.7 m person for scale. Label it modeled and approximate.
+  5. A "Neighborhoods" group: the six highest by exposed buildings, each with its count and a
+     chevron, then a "Show all" row. Suppressed rows read "Not enough data."
+  6. An "About this data" group: an "Accuracy" row with its value and a chevron, and a "Limits
+     and misuse notice" row that opens the Dialog.
+- Scrubber: floats at the bottom center. A play button, a native range input, and the year in
+  title size. Arrow keys step one year. It never starts by itself. The step interval is one
+  named constant in `web/src/lib/`.
+- An info button at the top right opens the same Limits Dialog.
+
+Acceptance: the root view works against the real API in light and dark.
+
+### M6d. Detail views
+
+- Neighborhood detail: large title with the name. A grouped list of label and value rows:
+  exposed buildings for the selected year, total buildings in the zone, and growth since 2016. A
+  "Summary" paragraph from the brief, with a footnote line "Written from the numbers above.
+  Numbers checked." If the neighborhood is suppressed, show one InlineMessage that explains the
+  minimum count.
+- Accuracy detail: rows for accuracy, precision, recall, labeled cells, sampling method, and
+  unclear cells left out, with a footnote about the tuning and test split.
+- Limits Dialog: the native `dialog` element. It shows the limits list and the misuse notice from
+  `/limits`. It closes with Escape or a "Done" text button and returns focus.
+
+### M6e. States and accessibility
+
+- Every data-driven component renders loading, error, empty, and suppressed states, each with a
+  test. Loading is a small activity indicator with a text label, never a shimmer. Errors are one
+  plain sentence and a "Try again" text button.
+- Add a test where the selection changes quickly while a slow mocked response is pending. The
+  latest selection wins.
+- Announce year and scenario changes politely through an `aria-live` region.
+- Support reduced motion, reduced transparency, and increased contrast. Check zoom at 200 percent.
+- Phone layout: the bottom sheet with two heights, switched by a grabber button.
+- Give screen readers a text summary of the map. The ranked list is the accessible alternative.
+
+### M6f. Design review gate
+
+Run DESIGN_RULES.md section 9. Save screenshots to `docs/design-review/` and record the result in
+`docs/DESIGN_REVIEW.md`. Fix every pattern hit, and repeat until the scan is clean.
+
+Acceptance: all screens work against the real API, `make check` passes, and the review passes.
+
+GATE M6: the human reviews the screenshots and approves the look.
 
 ## M7. Briefs
 
@@ -231,14 +314,17 @@ Each is a full vertical slice: computation, API, UI, tests, and a dependency not
 | Gemini fails | Templated brief from the same JSON |
 | Flood layer misses small drains | Say it on screen, it is river flooding only |
 | Message misread as an enforcement tool | Neighborhood-only output and the misuse notice |
+| The interface drifts toward a generic look | Run the pattern scan and the remove-one test at the gate |
 | A guardrail blocks progress | Fix the cause. Never weaken the rule. |
 
 ## Kickoff prompts for Claude Code
 
-- "Read CLAUDE.md, CODE_RULES.md, and PLAN.md. Do M0 only. Stop at the gate with the
-  scratch-violation proof."
+- "Read CLAUDE.md, CODE_RULES.md, DESIGN_RULES.md, and PLAN.md. Do M0 only. Stop at the gate with
+  the scratch-violation proof."
 - "Do M1. Stop at the gate and tell me which data access path worked."
 - "Do M2, then show the gate output."
 - "Do the Claude Code tasks in M3 and M4 together. Tell me when the labeling sheet is ready."
-- "Do M5, then M6. Stop at each gate."
-- "Do M7 and M8. Run the demo script and report any failures."
+- "Do M5. Stop at the gate."
+- "Do M6a and M6b. Stop at the M6a gate with the contrast test output."
+- "Do M6c through M6f. Prepare the screenshots for the design review and stop at the M6 gate."
+- "Do M7 and M8. Run the demo script and the design review, and report any failures."

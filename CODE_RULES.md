@@ -10,6 +10,8 @@ shortcut disagree, the rule wins.
 
 - Linters and type checkers with strict settings (configured in milestone M0).
 - `scripts/check_repo_rules.py` for rules the linters do not cover.
+- `scripts/check_design_rules.py` for the visual rules in DESIGN_RULES.md. Read that file
+  before writing any frontend code.
 - A health report at every gate (see the end of this file).
 - Type escapes always fail the check: `any`, `as any`, `as unknown as X`, `@ts-ignore`,
   `@ts-expect-error`, `@ts-nocheck`. Fix the data shape instead.
@@ -125,6 +127,9 @@ never lives in a component or a router.
 
 - Banned packages: `axios`, `node-fetch`, `request`, `requests`, `aiohttp`, `lodash`,
   `moment`, `redux`, `@reduxjs/toolkit`, `zustand`, `mobx`, `leaflet`, `react-leaflet`.
+- Styling is plain CSS Modules plus `web/src/styles/tokens.css`. No UI kit, no CSS-in-JS, no
+  utility-class framework, no icon library, no animation library, and no web fonts. The
+  design checker bans these packages.
 - Prefer the standard library and modern native features before adding a package.
 - Unused or missing dependencies fail the check (deptry for Python, knip for the frontend).
 

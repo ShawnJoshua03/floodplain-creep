@@ -78,3 +78,10 @@ None yet.
 - Tests use a real local Postgres from `pgserver`, one throwaway schema per test.
 - Tables: `neighborhoods`, `neighborhood_year_exposure`, `validation_result`, `briefs`. Column names follow the CSV (`buildings_in_zone`, `new_buildings_in_zone`, `growth_pct`). `year_start` is a date such as 2016-01-01.
 - The load replaces exposure rows, upserts neighborhoods, and keeps `briefs`. It adds a `validation_result` row when `validation_result.json` exists.
+
+## Plan update: design rules (applied 2026-11-07)
+- Added DESIGN_RULES.md, `scripts/check_design_rules.py` and `tests/test_design_rules.py` as supplied, plus the revised CLAUDE.md, CODE_RULES.md, PLAN.md and Makefile. `make check` now includes `design-check`, and the pre-commit hook runs the design checker.
+- The two Python files were run through `ruff format` only (hex escapes became lowercase). Behaviour is unchanged and all 32 design tests pass.
+- The supplied Makefile calls `python3`. It stays on `uv run python` for the reason in the Tooling section.
+- `web/src/styles/` has a minimal `tokens.css`, `base.css`, `materials.css` and `motion.css`, imported in `main.tsx`. M6a fills in the full token set and the contrast test.
+- Design scratch-violation proof, each failing `make check` for the right reason: hex color outside tokens.css, gradient, raw 12px length, emoji, inline style, banned design package (`framer-motion`).

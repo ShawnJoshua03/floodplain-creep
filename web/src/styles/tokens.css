@@ -1,0 +1,30 @@
+/* Every color, size, radius, duration, shadow and font lives here. M6a fills in the full set. */
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --bg: #ffffff;
+  --label: #000000;
+  --accent: #007aff;
+  --chrome-bg: #ffffffcc;
+
+  --text-body: 1.0625rem;
+  --line-body: 1.4;
+
+  --space-1: 0.25rem;
+  --blur-chrome: 1.25rem;
+  --focus-ring: 2px solid var(--accent);
+
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 350ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000;
+    --label: #ffffff;
+    --accent: #0a84ff;
+    --chrome-bg: #1c1c1ecc;
+  }
+}

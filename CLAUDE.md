@@ -1,7 +1,8 @@
 # Floodplain Creep
 
 Hackathon project, solo builder. This file is the standing brief.
-At the start of every session read, in this order: CLAUDE.md, CODE_RULES.md, PLAN.md.
+At the start of every session read, in this order: CLAUDE.md, CODE_RULES.md,
+DESIGN_RULES.md, PLAN.md.
 `make check` must pass before every commit and at every gate.
 
 ## What we are building
@@ -17,6 +18,9 @@ Core features:
 - A plain-language brief per neighborhood, written by Gemini from computed numbers only.
 - A measured accuracy card, computed from hand-labeled satellite samples.
 - An honesty panel and a misuse notice that are always one click away.
+
+The interface is a full-bleed map with one floating sheet, in light and dark, styled to
+feel like a native Apple-platform app. DESIGN_RULES.md defines the look.
 
 Anything not listed here or in PLAN.md is out of scope. Ask before adding it.
 
@@ -71,6 +75,17 @@ The short version:
 - Search the repo and `docs/DEPENDENCIES.md` before writing a helper.
 - Run `make check` before every commit and print the health report at every gate.
 
+## Design quality contract
+
+DESIGN_RULES.md is binding. It exists to stop the generic "AI look": gradients, glow, colored
+side borders, emoji icons, card walls, stat tiles, chips, and marketing words. Never weaken it.
+You may add checks to `scripts/check_design_rules.py`, with a test for each.
+
+- Every color, size, radius, duration, and font comes from `web/src/styles/tokens.css`.
+- System font stack only. Plain CSS Modules. No UI kit, icon library, or animation library.
+- Quiet over clever. When unsure, remove an element instead of adding one.
+- Run the design review gate at the end of M6 and at M8.
+
 ## Data sources (verify each before relying on it)
 
 - Open Buildings 2.5D Temporal Dataset (Google Research). Annual building presence,
@@ -98,23 +113,24 @@ Never invent URLs, band names, or API parameters. Read the official page and rec
 - Database: Tiger Data (PostgreSQL). Read its docs before writing SQL. Hypertables and
   continuous aggregates are used only if the documented setup works. App code is plain SQL
   and must run on any Postgres.
-- Frontend: Vite, React, TypeScript, MapLibre GL, TanStack Query. Dev: ESLint, Vitest,
-  Testing Library, knip.
+- Frontend: Vite, React, TypeScript, MapLibre GL, TanStack Query, plain CSS Modules with a
+  token file. Dev: ESLint, Vitest, Testing Library, knip. Nothing else for design.
 
 ## Repo layout
 
 ```
 floodplain-creep/
-  CLAUDE.md  CODE_RULES.md  PLAN.md  README.md  Makefile  .env.example
+  CLAUDE.md  CODE_RULES.md  DESIGN_RULES.md  PLAN.md  README.md  Makefile  .env.example
   config/     city.yaml  resources.yaml  banned_terms.txt  misuse_notice.txt
   db/         schema.sql
   data/       raw/  processed/            (gitignored)
   pipeline/   steps/  lib/  io/           (see CODE_RULES.md section 1)
   api/        routers/  services/  repositories/  schemas/  safety/  core/
-  web/        src/api/  components/  features/  state/  lib/
-  scripts/    check_repo_rules.py  warm_briefs.py  dump_openapi.py
+  web/        src/api/  components/  components/icons/  features/  state/  lib/  styles/
+  scripts/    check_repo_rules.py  check_design_rules.py  warm_briefs.py  dump_openapi.py
   tests/
   docs/       DECISIONS.md  DEPENDENCIES.md  GLOSSARY.md  SOURCES.md  DEMO.md
+              DESIGN_REVIEW.md  design-reference/  design-review/
 ```
 
 ## Working agreements
@@ -135,3 +151,4 @@ floodplain-creep/
 - Every product hard rule has a passing test.
 - The accuracy card reads real validation output.
 - The demo script in `docs/DEMO.md` runs without errors.
+- The design review gate passes, with screenshots in `docs/design-review/`.
