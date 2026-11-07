@@ -8,11 +8,11 @@ DESIGN_RULES.md, PLAN.md.
 ## What we are building
 
 A web app that shows, neighborhood by neighborhood, how many new buildings have appeared on
-flood-prone ground in one city since 2016. It uses open satellite-derived building data and
+flood-prone ground in one city since 2018. It uses open satellite-derived building data and
 free flood hazard maps.
 
 Core features:
-- A time-lapse of exposed buildings by neighborhood, 2016 to 2023.
+- A time-lapse of exposed buildings by neighborhood, 2018 to 2023.
 - Flood scenarios by return period (10, 50, 100, 500 years) with a modeled depth overlay.
 - A human-height silhouette next to the depth legend, so depth is easy to grasp.
 - A plain-language brief per neighborhood, written by Gemini from computed numbers only.
@@ -50,7 +50,7 @@ compensation for evicted residents. This app must not become a target list.
    On failure or API error, store a templated brief and mark its `source` as `template`.
 5. Report validation honestly. Accuracy, precision, and recall are read from the stored
    validation result. Never hardcode them. Show the sampling method next to them.
-6. Show the limits on screen: data years 2016 to 2023, building detections can be unstable
+6. Show the limits on screen: data years 2018 to 2023 (2016 and 2017 are not used because detections are unstable), building detections can be unstable
    between years, the flood layer is river flooding only at about 90 m, this is not an
    official warning, and it is not for evictions or enforcement.
 7. Growth type is a pattern, not a wealth label. Do not call any pattern "informal" or

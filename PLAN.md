@@ -96,7 +96,7 @@ Put math in `pipeline/lib/`, with tests on small synthetic arrays. Steps stay th
   low-confidence presence), and flood exposure per cell per return period (depth above the
   dataset minimum, excluding permanent water and spurious-depth cells).
 - `aggregation.py`: roll cells up to neighborhoods by year and return period. Output exposed
-  buildings, total buildings in the zone, and growth since 2016.
+  buildings, total buildings in the zone, and growth since 2018.
 - `suppression.py`: the one place the K rule is applied. Suppressed rows get null counts and a
   `suppressed` flag.
 - `pipeline/io/boundaries.py`: load the neighborhood boundaries. Record the source.
@@ -124,7 +124,7 @@ Claude Code:
   60 percent of labels. Report final metrics only on the remaining 40 percent. Write a
   validation result file with the sampling note and the count of excluded "unclear" cells.
 
-HUMAN: for each sampled cell, compare imagery from about 2016 and about 2023. Label it
+HUMAN: for each sampled cell, compare imagery from about 2018 and about 2023. Label it
 `increase`, `no_clear_change`, `decrease`, or `unclear`. Use any imagery source with dates, and
 write the source and dates in `docs/DECISIONS.md`.
 
@@ -215,7 +215,7 @@ GATE M6a: show the contrast test output and a list of the primitives with their 
 - Root view, in this order:
   1. Large title "Floodplain Creep" with the city as a subtitle.
   2. SegmentedControl for the scenario: 10, 50, 100, and 500-year.
-  3. A summary block: the label "New buildings in the modeled flood zone since 2016" and the
+  3. A summary block: the label "New buildings in the modeled flood zone since 2018" and the
      number, set in the title size. No card around it.
   4. A SwitchRow "Show flood depth". When on, a depth key row shows the four depth bins beside
      a 1.7 m person for scale. Label it modeled and approximate.
@@ -233,7 +233,7 @@ Acceptance: the root view works against the real API in light and dark.
 ### M6d. Detail views
 
 - Neighborhood detail: large title with the name. A grouped list of label and value rows:
-  exposed buildings for the selected year, total buildings in the zone, and growth since 2016. A
+  exposed buildings for the selected year, total buildings in the zone, and growth since 2018. A
   "Summary" paragraph from the brief, with a footnote line "Written from the numbers above.
   Numbers checked." If the neighborhood is suppressed, show one InlineMessage that explains the
   minimum count.
@@ -297,7 +297,7 @@ Each is a full vertical slice: computation, API, UI, tests, and a dependency not
 
 1. Hook: "Cities are building into their floodplains. The people living there pay when the
    rains come."
-2. Time-lapse: play 2016 to 2023 and read the city counter.
+2. Time-lapse: play 2018 to 2023 and read the city counter.
 3. Scenario: switch to the 500-year flood. Show the depth overlay and the silhouette.
 4. Neighborhood: click one and read the brief. Mention the number check.
 5. Trust: show the accuracy card and the sampling note. Say what the tool cannot see.
