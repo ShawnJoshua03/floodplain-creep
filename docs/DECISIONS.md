@@ -28,3 +28,19 @@ None yet.
 
 ## Hooks
 - Pre-commit hook lives in `.githooks/pre-commit`. After a fresh clone run `git config core.hooksPath .githooks`.
+
+## Per-module type overrides
+- `rasterio` and `rasterio.*`: ignore missing imports in `[[tool.mypy.overrides]]`. The package ships no type stubs. No inline `# type: ignore` is used.
+
+## M1 data access
+- Buildings path: public GCS bucket over HTTPS, windowed reads by GDAL `/vsicurl/`. No Earth Engine account needed.
+- Buildings are summed from 0.5 m to 4 m pixels while streaming, 512 source rows at a time. Reading the box at full resolution would be about 10 GB per year. Fractional count is summed, so totals are kept. Height and presence use the block maximum.
+- `data/raw/buildings/buildings_<year>.tif` is not tied to the box in the file name. If `bbox` in `config/city.yaml` changes, delete these files first.
+- Flood path: direct download from the JRC data store, six files for the Nairobi tile (about 77 MB).
+- Fetch steps print each raster. Run: `uv run python -m pipeline.steps.fetch_flood` and `uv run python -m pipeline.steps.fetch_buildings [year ...]`. One year takes about 3 minutes.
+
+## M1 finding: flood layer is empty in central Nairobi (needs a human decision)
+- Box 36.7525..36.8875 E, -1.3535..-1.2185 N: for RP10, RP50, RP100 and RP500 the only valid pixels are the same 24 as the permanent water layer, all with depth 1. No modeled river flooding.
+- Wider area is fine (about 66,500 flooded pixels at RP100 in 36.0..37.6 E, -2.2..-0.4 N), so the read is correct. The layer misses small urban channels, as the README and our "river flooding only" limit say.
+- Candidate boxes with flooding, ranked by flooded pixels at RP100 (permanent water and spurious depth excluded), within about 50 km of Nairobi: centre 37.07 E, -1.25 N (about 2,000 of 26,000 pixels, Ruiru / Juja corridor).
+- Options: move the box to that corridor, choose another city, or keep central Nairobi and accept an empty flood signal. None is chosen yet.

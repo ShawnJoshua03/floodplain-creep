@@ -5,6 +5,11 @@ description = "Neighborhood-level view of new buildings in modeled flood zones."
 requires-python = ">=3.12"
 dependencies = [
     "fastapi",
+    "httpx>=0.28.1",
+    "numpy>=2.5.4",
+    "pydantic>=2.14.3",
+    "pyyaml>=6.0.3",
+    "rasterio>=1.5.2",
 ]
 
 [dependency-groups]
@@ -14,6 +19,7 @@ dev = [
     "mypy",
     "vulture",
     "deptry",
+    "types-pyyaml>=6.0.12.20261103",
 ]
 
 [tool.uv]
@@ -47,3 +53,7 @@ pythonpath = [".", "scripts"]
 [tool.deptry]
 extend_exclude = ["web", "data"]
 known_first_party = ["extra_rules", "check_repo_rules"]
+
+[[tool.mypy.overrides]]
+module = ["rasterio", "rasterio.*"]
+ignore_missing_imports = true

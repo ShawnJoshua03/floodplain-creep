@@ -30,3 +30,9 @@ Every declared dependency has one line: `- `name`: reason`. A check compares thi
 - `@testing-library/jest-dom`: DOM assertions.
 - `knip`: unused file, export and dependency finder.
 - `openapi-typescript`: generates API types from the OpenAPI schema.
+- `rasterio`: read and write GeoTIFFs, reproject bounds.
+- `numpy`: array maths for rasters.
+- `httpx`: all Python HTTP downloads.
+- `pydantic`: validate manifests, GeoJSON and config at the boundary.
+- `pyyaml`: read `config/city.yaml`.
+- `types-pyyaml`: type stubs for pyyaml.

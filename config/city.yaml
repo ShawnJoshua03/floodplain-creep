@@ -4,5 +4,5 @@ min_count_k: 20
 years: [2016, 2023]
 return_periods: [10, 50, 100, 500]
 grid_size_m: 100
-# Bounding box (lon_min, lat_min, lon_max, lat_max) is set in M1 after data access is confirmed.
-bbox: null
+# Bounding box (lon_min, lat_min, lon_max, lat_max). About 15 km by 15 km around central Nairobi.
+bbox: [36.7525, -1.3535, 36.8875, -1.2185]
