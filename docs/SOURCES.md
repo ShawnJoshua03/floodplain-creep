@@ -16,7 +16,7 @@ All checked 2026-11-07. City: Dhaka (see DECISIONS.md).
 - Page does not give a counting method or a presence threshold (it points to the technical report). We have not read the report. Settle this in M2 before using counts.
 - Our derived rasters: `data/raw/buildings/buildings_<year>.tif`, 4 m pixels (8 x 8 source pixels), EPSG:32737, nodata -99.
   - count is the sum of fractional counts (totals are preserved). Height and presence are the block maximum.
-  - Dhaka box 3803 x 3509 px at 4 m, EPSG:32646 (lon 90.3425..90.4775, lat 23.7425..23.8775).
+  - Dhaka box about 3.7k x 3.5k px at 4 m, EPSG:32646 (lon 90.3425..90.4775, lat 23.6925..23.8275). Grid is 153 x 142 cells of 100 m.
 
 ## JRC Global River Flood Hazard Maps v2.1.2 (Copernicus EMS)
 - Folder: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/flood_hazard/ and its `README.txt`.
@@ -32,5 +32,5 @@ All checked 2026-11-07. City: Dhaka (see DECISIONS.md).
 - geoBoundaries Bangladesh ADM3 (thana level), release gbOpen, year represented 2020, 544 units. Metadata: https://www.geoboundaries.org/api/current/gbOpen/BGD/ADM3/
 - Download: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BGD/ADM3/geoBoundaries-BGD-ADM3.geojson saved as `data/raw/boundaries/adm3.geojson` (125 MB, gitignored).
 - License: CC BY 3.0 IGO. Credit geoBoundaries in the README.
-- 34 units touch the box. About 28 are Dhaka city thanas (Gulshan, Mirpur, Dhanmondi, Motijheel and others). Savar, Keraniganj, Kaliganj, Rupganj and Demra are partly outside the box and need clipping or a rule in M2.
+- 40 units touch the box. 33 have at least half their area inside it and are kept, clipped to the box. See DECISIONS.md for the dropped ones.
 - Ward level was not found as open data. OpenStreetMap has one ward relation in the box (Mirpur 2). Thana level is the smallest unit we can source.

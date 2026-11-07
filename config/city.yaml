@@ -4,5 +4,11 @@ min_count_k: 20
 years: [2016, 2023]
 return_periods: [10, 50, 100, 500]
 grid_size_m: 100
+# Building presence is uncalibrated confidence. 0.45 follows published use; see docs/DECISIONS.md.
+presence_threshold: 0.45
+# JRC minimum modeled depth in metres. Pixels below this are not flood.
+min_depth_m: 0.1
+# A neighborhood is kept only if at least this share of its area lies inside the box.
+min_coverage: 0.5
 # Bounding box (lon_min, lat_min, lon_max, lat_max). About 15 km by 15 km around central Dhaka.
-bbox: [90.3425, 23.7425, 90.4775, 23.8775]
+bbox: [90.3425, 23.6925, 90.4775, 23.8275]

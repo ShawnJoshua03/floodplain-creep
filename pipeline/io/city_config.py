@@ -19,6 +19,9 @@ class CityConfig(BaseModel):
     years: list[int]
     return_periods: list[int]
     grid_size_m: int
+    presence_threshold: float
+    min_depth_m: float
+    min_coverage: float
     bbox: list[float]
 
     @model_validator(mode="after")

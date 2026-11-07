@@ -12,6 +12,7 @@ from rasterio.transform import from_origin
 from rasterio.warp import transform_bounds
 from rasterio.windows import Window
 
+from pipeline.lib.grid import RasterFrame
 from pipeline.lib.summary import BandRange, RasterSummary
 from pipeline.lib.tiles import Bounds
 
@@ -88,3 +89,21 @@ def band_range(band: np.ma.MaskedArray[tuple[int, int], np.dtype[np.float32]], n
     if valid == 0:
         return BandRange(name, float("nan"), float("nan"), 0)
     return BandRange(name, float(band.min()), float(band.max()), valid)
+
+
+@dataclass(frozen=True)
+class BuildingYear:
+    count: npt.NDArray[np.float32]
+    presence: npt.NDArray[np.float32]
+    frame: RasterFrame
+    nodata: float
+    crs: str
+
+
+def read_building_year(path: Path) -> BuildingYear:
+    """Read the yearly 4 m building raster written by fetch_buildings."""
+    with rasterio.open(path) as src:
+        count = np.asarray(src.read(1), dtype=np.float32)
+        presence = np.asarray(src.read(3), dtype=np.float32)
+        frame = RasterFrame(src.transform.c, src.transform.f, src.height, src.width, src.res[0])
+        return BuildingYear(count, presence, frame, float(src.nodata), str(src.crs))

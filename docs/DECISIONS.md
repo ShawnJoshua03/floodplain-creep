@@ -42,6 +42,22 @@ None yet.
 ## M1 finding and city change: Nairobi to Dhaka
 - Box 36.7525..36.8875 E, -1.3535..-1.2185 N: for RP10, RP50, RP100 and RP500 the only valid pixels were the same 24 as the permanent water layer, all with depth 1. No modeled river flooding. A wider window had about 66,500 flooded pixels, so the read was right and the layer misses small urban channels.
 - 16 cities were scanned for RP100 flooded pixels in a 15 km box. Dhaka centre box: 13,470 of 26,244 pixels.
-- Human chose Dhaka. Box 90.3425..90.4775 E, 23.7425..23.8775 N in `config/city.yaml`. The Nairobi building rasters were deleted.
+- Human chose Dhaka. Box first set to 90.3425..90.4775 E, 23.7425..23.8775 N (moved in M2, next section). The Nairobi building rasters were deleted.
 - Dhaka sanity check: buildings 390,221 (2016) to 523,511 (2023), +34%. Share of buildings in the RP100 zone 34.8% to 39.4%. The JRC layer marks about 57% of the box as flooded above 0.1 m, so the zone is wide. Read results with the 90 m and river-only limits in mind.
 - Boundaries: geoBoundaries ADM3 (thana level), because no open ward polygons were found. Neighbourhood means thana here.
+
+## M2 computation choices
+- Box moved south in M2 to 90.3425..90.4775 E, 23.6925..23.8275 N. Root cause: the first box cut off Old Dhaka, so Motijheel, Paltan, Shahbagh, Hazaribagh and Sabujbagh fell under the coverage rule. The new box keeps 33 neighborhoods. Demra, Kadamtali, Keraniganj, Khilkhet, Rupganj, Savar and Turag are dropped (under 50% inside the box). Building rasters were refetched.
+- Building count: sum of `building_fractional_count`, kept only where `building_presence` is at least 0.45 (`presence_threshold`). Source: the dataset page says confidence is for relative ranking only and gives no threshold; a published paper used 0.45. We have not read the dataset technical report.
+- Threshold sensitivity (first box, 2016 to 2023): 0 gives 390k to 524k (+34%), 0.3 gives +36%, 0.45 gives +39%, 0.6 gives +37%, 0.75 gives +29%. Absolute totals fall from 390k to 167k as the threshold rises. Treat counts as relative, not exact.
+- Grid: 100 m cells in EPSG:32646. Buildings are summed from 4 m pixels. Flood depth, permanent water and spurious depth are resampled to the grid with the maximum of the ~90 m source pixels, so thin flooded strips are kept. This leans toward a wider zone.
+- Flood zone cell: modeled depth at least `min_depth_m` (0.1, the JRC dataset minimum), not permanent water, not spurious depth.
+- Neighborhood = geoBoundaries ADM3 polygon clipped to the box, kept when at least 50% of its area is inside. A cell belongs to the polygon holding its centre.
+- Table columns (these replace the PLAN.md names `exposed_buildings` and `total_buildings_in_zone`; use them in the M4 schema): `buildings_in_zone`, `new_buildings_in_zone`, `growth_pct`, `suppressed`, `change_available`.
+- K rule: stock below K=20 is suppressed with null counts. New buildings and growth since 2016 are shown only when both the year and the 2016 value reach K. Otherwise a shown change would reveal a hidden 2016 count. This rule is in `pipeline/lib/suppression.py` only, and `check_rows` verifies every row before the CSV is written.
+
+## M2 finding: the 2016 baseline looks unstable
+- Citywide buildings in the RP100 zone: 2016 182,749; 2017 205,505; 2018 246,874; 2019 250,035; 2020 261,632; 2021 256,714; 2022 246,922; 2023 263,637.
+- Most of the 2016 to 2023 rise (+44%) happens by 2018, then the series is flat or falls. All buildings show the same shape (426k, 470k, 564k, 551k, 579k, 579k, 553k, 581k). Real building growth rarely looks like this. It more likely reflects imagery or model changes, which the dataset page warns about.
+- Gendaria shows a decrease (-9) in the zone, another sign of detection noise.
+- Effect: "new buildings since 2016" probably overstates real change. Options: keep 2016 and say so on screen, switch the baseline to 2018, or report a smoothed trend. Decide at the gate; M3 validation labels (2016 vs 2023 imagery) will measure how well the change signal matches reality.

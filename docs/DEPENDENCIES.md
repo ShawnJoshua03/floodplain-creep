@@ -36,3 +36,8 @@ Every declared dependency has one line: `- `name`: reason`. A check compares thi
 - `pydantic`: validate manifests, GeoJSON and config at the boundary.
 - `pyyaml`: read `config/city.yaml`.
 - `types-pyyaml`: type stubs for pyyaml.
+- `geopandas`: read boundary polygons and reproject them.
+- `shapely`: polygon geometry for neighborhoods.
+- `types-shapely`: type stubs for shapely.
+- `types-geopandas`: type stubs for geopandas.
+- `pandas-stubs`: type stubs for pandas, which geopandas uses.

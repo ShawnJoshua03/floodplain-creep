@@ -5,7 +5,16 @@ from pydantic import ValidationError
 
 from pipeline.io.city_config import load_city_config
 
-BASE = "city: X\nmin_count_k: 20\nyears: [2016, 2018]\nreturn_periods: [100]\ngrid_size_m: 100\n"
+BASE = """\
+city: X
+min_count_k: 20
+years: [2016, 2018]
+return_periods: [100]
+grid_size_m: 100
+presence_threshold: 0.45
+min_depth_m: 0.1
+min_coverage: 0.5
+"""
 
 
 def write(tmp_path: Path, bbox: str) -> Path:
