@@ -6,15 +6,14 @@ Output: data/processed/neighborhood_year_exposure.csv and neighborhoods.geojson.
 
 from __future__ import annotations
 
-from pipeline.io.boundaries import load_neighborhoods, write_neighborhood_geojson
+from pipeline.io.boundaries import write_neighborhood_geojson
 from pipeline.io.cell_store import load_cells
 from pipeline.io.city_config import ROOT, load_city_config
 from pipeline.io.exposure_csv import write_exposure_csv
+from pipeline.io.neighborhood_labels import load_labels
 from pipeline.lib.aggregation import zone_totals
-from pipeline.lib.labels import rasterize_neighborhoods
 from pipeline.lib.suppression import apply_suppression, check_rows
 
-BOUNDARIES = ROOT / "data" / "raw" / "boundaries" / "adm3.geojson"
 CELLS = ROOT / "data" / "processed" / "cells.npz"
 OUT_DIR = ROOT / "data" / "processed"
 
@@ -22,11 +21,11 @@ OUT_DIR = ROOT / "data" / "processed"
 def main() -> None:
     config = load_city_config()
     store = load_cells(CELLS)
-    loaded = load_neighborhoods(BOUNDARIES, config.lonlat_bounds, store.grid.crs, config.min_coverage)
-    for item in loaded.dropped:
+    found = load_labels(config, store)
+    for item in found.loaded.dropped:
         print(f"Dropped {item.name}: only {item.coverage:.0%} inside the box")
-    kept = loaded.kept
-    labels = rasterize_neighborhoods([n.geometry for n in kept], store.grid)
+    kept = found.loaded.kept
+    labels = found.labels
     totals = zone_totals(
         store.counts, store.flooded, labels, [n.neighborhood_id for n in kept], store.years, store.return_periods
     )

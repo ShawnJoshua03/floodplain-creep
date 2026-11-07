@@ -8,6 +8,7 @@ dependencies = [
     "geopandas>=1.2.0",
     "httpx>=0.28.1",
     "numpy>=2.5.4",
+    "psycopg[binary]>=3.3.8",
     "pydantic>=2.14.3",
     "pyyaml>=6.0.3",
     "rasterio>=1.5.2",
@@ -25,6 +26,7 @@ dev = [
     "types-shapely>=2.1.0.20261030",
     "types-geopandas>=1.2.0.20261107",
     "pandas-stubs>=3.1.0.261029",
+    "pgserver>=0.1.4",
 ]
 
 [tool.uv]

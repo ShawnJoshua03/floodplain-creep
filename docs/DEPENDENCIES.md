@@ -41,3 +41,5 @@ Every declared dependency has one line: `- `name`: reason`. A check compares thi
 - `types-shapely`: type stubs for shapely.
 - `types-geopandas`: type stubs for geopandas.
 - `pandas-stubs`: type stubs for pandas, which geopandas uses.
+- `psycopg`: PostgreSQL client for the pipeline loader (API uses it in M5).
+- `pgserver`: pip-installed local PostgreSQL so database tests run without Docker or an account.

@@ -1,0 +1,12 @@
+# Validation sample design (M3). Do not change after labeling starts: it would change the sample.
+return_period: 100
+n_random: 100
+n_flagged: 40
+flag_threshold: 12.0
+seed: 42
+
+# HUMAN: fill these two lines after labeling. The accuracy card shows them.
+# Example: imagery_source: "Google Earth Pro historical imagery"
+#          imagery_dates: "start about 2016-02, end about 2023-01"
+imagery_source: ""
+imagery_dates: ""

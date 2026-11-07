@@ -42,3 +42,27 @@ def write_exposure_csv(path: Path, rows: list[ExposureRow]) -> None:
                     str(row.change_available).lower(),
                 ]
             )
+
+
+def optional_int(text: str) -> int | None:
+    return int(text) if text else None
+
+
+def read_exposure_csv(path: Path) -> list[ExposureRow]:
+    with path.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        if reader.fieldnames != COLUMNS:
+            raise ValueError(f"Unexpected columns in {path}: {reader.fieldnames}")
+        return [
+            ExposureRow(
+                neighborhood_id=r["neighborhood_id"],
+                year=int(r["year"]),
+                return_period=int(r["return_period"]),
+                buildings_in_zone=optional_int(r["buildings_in_zone"]),
+                new_buildings_in_zone=optional_int(r["new_buildings_in_zone"]),
+                growth_pct=float(r["growth_pct"]) if r["growth_pct"] else None,
+                suppressed=r["suppressed"] == "true",
+                change_available=r["change_available"] == "true",
+            )
+            for r in reader
+        ]

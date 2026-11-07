@@ -9,10 +9,10 @@ import numpy as np
 import numpy.typing as npt
 import rasterio
 from rasterio.transform import from_origin
-from rasterio.warp import transform_bounds
+from rasterio.warp import transform, transform_bounds
 from rasterio.windows import Window
 
-from pipeline.lib.grid import RasterFrame
+from pipeline.lib.grid import GridDef, RasterFrame
 from pipeline.lib.summary import BandRange, RasterSummary
 from pipeline.lib.tiles import Bounds
 
@@ -107,3 +107,11 @@ def read_building_year(path: Path) -> BuildingYear:
         presence = np.asarray(src.read(3), dtype=np.float32)
         frame = RasterFrame(src.transform.c, src.transform.f, src.height, src.width, src.res[0])
         return BuildingYear(count, presence, frame, float(src.nodata), str(src.crs))
+
+
+def cell_centres_lonlat(grid: GridDef, cells: list[tuple[int, int]]) -> list[tuple[float, float]]:
+    """Return (lon, lat) for the centre of each (row, col) cell."""
+    xs = [grid.left + (col + 0.5) * grid.cell_m for _, col in cells]
+    ys = [grid.top - (row + 0.5) * grid.cell_m for row, _ in cells]
+    lons, lats = transform(grid.crs, "EPSG:4326", xs, ys)
+    return list(zip(lons, lats, strict=True))

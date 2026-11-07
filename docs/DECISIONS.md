@@ -61,3 +61,20 @@ None yet.
 - Most of the 2016 to 2023 rise (+44%) happens by 2018, then the series is flat or falls. All buildings show the same shape (426k, 470k, 564k, 551k, 579k, 579k, 553k, 581k). Real building growth rarely looks like this. It more likely reflects imagery or model changes, which the dataset page warns about.
 - Gendaria shows a decrease (-9) in the zone, another sign of detection noise.
 - Effect: "new buildings since 2016" probably overstates real change. Options: keep 2016 and say so on screen, switch the baseline to 2018, or report a smoothed trend. Decide at the gate; M3 validation labels (2016 vs 2023 imagery) will measure how well the change signal matches reality.
+
+## M3 validation design
+- Cell change = building count in the last year minus the first year (2023 minus 2016), per 100 m cell, with the same presence mask as the counts.
+- Sample: 100 cells drawn at random from the 6,912 flood-zone (RP100) cells inside a kept neighborhood, plus 40 cells drawn at random from the 1,940 cells with an increase of 12 or more buildings. Seed 42. Settings are in `config/validation.yaml`. The 12-building cutoff exists because 62% of zone cells rise by 2 or more, so a low cutoff would flag most cells.
+- The labeling sheet (`data/processed/labeling_sheet.csv`) has cell id, place, two links and an empty label. It has no algorithm output and no sample type, and its row order is shuffled.
+- Labels: `increase`, `no_clear_change`, `decrease`, `unclear`. Increase is the positive class. `no_clear_change` and `decrease` are negatives. `unclear` cells are dropped and counted.
+- Evaluation: the first 60% of labeled cells in sheet order pick the change threshold (best F1, ties go to the lower threshold). Accuracy, precision, recall and Wilson 95% intervals come from the remaining 40% only.
+- Limitation: the 40 extra cells make the sample richer in increases than the city. Precision and recall describe the sample. The sampling note says so and travels with the result. Weighting back to the whole city is not done.
+- HUMAN: after labeling, write the imagery source and dates in `config/validation.yaml` (`imagery_source`, `imagery_dates`). Evaluation refuses to run while they are blank.
+
+## M4 database
+- Python is pinned to 3.12 (`.python-version`). Reason: `pgserver` (a local Postgres for tests) has no wheel for 3.14, which uv chose by default.
+- Fallback in use: plain PostgreSQL with the same schema. Label users see: none, this is invisible to them.
+- Tiger Data docs checked 2026-11-07: the hypertable syntax is `CREATE TABLE ... WITH (tsdb.hypertable, tsdb.partition_column='...')` or `create_hypertable` for an existing table. This is NOT tried: no Tiger Cloud account exists yet, and the table has about 1,000 rows. `db/schema.sql` stays plain SQL. If wanted later, convert `neighborhood_year_exposure` on `year_start` after loading.
+- Tests use a real local Postgres from `pgserver`, one throwaway schema per test.
+- Tables: `neighborhoods`, `neighborhood_year_exposure`, `validation_result`, `briefs`. Column names follow the CSV (`buildings_in_zone`, `new_buildings_in_zone`, `growth_pct`). `year_start` is a date such as 2016-01-01.
+- The load replaces exposure rows, upserts neighborhoods, and keeps `briefs`. It adds a `validation_result` row when `validation_result.json` exists.
