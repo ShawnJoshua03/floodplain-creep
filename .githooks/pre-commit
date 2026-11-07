@@ -1,0 +1,6 @@
+#!/bin/sh
+# Runs fast checks before each commit. Full gate is `make check`.
+set -e
+uv run ruff check .
+uv run ruff format --check .
+uv run python scripts/check_repo_rules.py

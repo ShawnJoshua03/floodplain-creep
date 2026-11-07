@@ -1,0 +1,5 @@
+def read() -> None:
+    try:
+        int("x")
+    except:
+        raise

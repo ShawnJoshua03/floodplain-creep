@@ -1,0 +1,8 @@
+# Nairobi is the default city (PLAN.md decision 1).
+city: Nairobi
+min_count_k: 20
+years: [2016, 2023]
+return_periods: [10, 50, 100, 500]
+grid_size_m: 100
+# Bounding box (lon_min, lat_min, lon_max, lat_max) is set in M1 after data access is confirmed.
+bbox: null

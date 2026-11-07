@@ -1,0 +1,49 @@
+[project]
+name = "floodplain-creep"
+version = "0.1.0"
+description = "Neighborhood-level view of new buildings in modeled flood zones."
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+    "mypy",
+    "vulture",
+    "deptry",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = ["web", "data"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "B", "UP", "ARG", "BLE", "ERA", "C90", "PLR0913", "PLR0915"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-args = 6
+max-statements = 40
+
+[tool.mypy]
+strict = true
+python_version = "3.12"
+mypy_path = "scripts"
+explicit_package_bases = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "scripts"]
+
+[tool.deptry]
+extend_exclude = ["web", "data"]
+known_first_party = ["extra_rules", "check_repo_rules"]
