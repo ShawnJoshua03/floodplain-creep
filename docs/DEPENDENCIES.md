@@ -45,3 +45,4 @@ Styling is plain CSS Modules plus `web/src/styles/tokens.css`. It adds no depend
 - `pandas-stubs`: type stubs for pandas, which geopandas uses.
 - `psycopg`: PostgreSQL client for the pipeline loader (API uses it in M5).
 - `pgserver`: pip-installed local PostgreSQL so database tests run without Docker or an account.
+- `pillow`: draw the before and after images used to review validation cells.

@@ -12,7 +12,6 @@ from pydantic import BaseModel
 
 from pipeline.io.city_config import ROOT
 from pipeline.lib.sampling import SampledCell
-from pipeline.lib.validation_metrics import LABELS
 
 CONFIG_PATH = ROOT / "config" / "validation.yaml"
 PROCESSED = ROOT / "data" / "processed"
@@ -20,6 +19,20 @@ DESIGN_PATH = PROCESSED / "validation_design.csv"
 META_PATH = PROCESSED / "validation_sample_meta.json"
 SHEET_PATH = PROCESSED / "labeling_sheet.csv"
 RESULT_PATH = PROCESSED / "validation_result.json"
+CAPTURES_PATH = PROCESSED / "labeling_captures.csv"
+AI_LABELS_PATH = PROCESSED / "ai_labels.csv"
+AUDIT_PATH = PROCESSED / "audit_sheet.csv"
+FINAL_LABELS_PATH = PROCESSED / "final_labels.csv"
+LABEL_META_PATH = PROCESSED / "label_meta.json"
+CAPTURE_COLUMNS = [
+    "cell_id",
+    "start_date",
+    "start_source",
+    "start_res_m",
+    "end_date",
+    "end_source",
+    "end_res_m",
+]
 SHEET_COLUMNS = ["cell_id", "latitude", "longitude", "earth_link", "satellite_link", "label"]
 
 
@@ -31,6 +44,10 @@ class ValidationConfig(BaseModel):
     seed: int
     imagery_source: str
     imagery_dates: str
+    wayback_start_release: str = "2017-11-16"
+    wayback_end_release: str = "2024-12-12"
+    wayback_zoom: int = 18
+    audit_size: int = 30
 
 
 @dataclass(frozen=True)
@@ -69,19 +86,6 @@ def write_labeling_sheet(path: Path, cells: list[SampledCell], places: list[Cell
             writer.writerow([cell.cell_id, f"{lat:.6f}", f"{lon:.6f}", earth, satellite, ""])
 
 
-def read_sheet_labels(path: Path) -> list[tuple[str, str]]:
-    """Return (cell_id, label) in sheet order. Raise when a label is blank or not allowed."""
-    with path.open(newline="", encoding="utf-8") as handle:
-        rows = [(r["cell_id"], r["label"].strip()) for r in csv.DictReader(handle)]
-    blank = [cell_id for cell_id, label in rows if not label]
-    if blank:
-        raise ValueError(f"{len(blank)} cells have no label yet, first: {blank[0]}")
-    bad = sorted({label for _, label in rows if label not in LABELS})
-    if bad:
-        raise ValueError(f"Unknown labels {bad}. Allowed: {sorted(LABELS)}")
-    return rows
-
-
 def write_json(path: Path, payload: dict[str, object]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
@@ -90,3 +94,54 @@ def write_json(path: Path, payload: dict[str, object]) -> None:
 def read_json(path: Path) -> dict[str, object]:
     loaded: dict[str, object] = json.loads(path.read_text(encoding="utf-8"))
     return loaded
+
+
+def write_capture_rows(rows: list[list[str]], path: Path = CAPTURES_PATH) -> None:
+    """Save capture dates by cell id. Rows already in the file for other cells are kept."""
+    merged: dict[str, list[str]] = {}
+    if path.exists():
+        with path.open(newline="", encoding="utf-8") as handle:
+            merged = {r[0]: r for r in list(csv.reader(handle))[1:]}
+    merged.update({r[0]: r for r in rows})
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(CAPTURE_COLUMNS)
+        writer.writerows(merged[key] for key in sorted(merged))
+
+
+def read_label_map(path: Path) -> dict[str, str]:
+    """Return {cell_id: label} for rows that have a label. A missing file gives an empty map."""
+    if not path.exists():
+        return {}
+    with path.open(newline="", encoding="utf-8") as handle:
+        return {r["cell_id"]: r["label"].strip() for r in csv.DictReader(handle) if r["label"].strip()}
+
+
+def read_sheet_order(path: Path = SHEET_PATH) -> list[str]:
+    with path.open(newline="", encoding="utf-8") as handle:
+        return [r["cell_id"] for r in csv.DictReader(handle)]
+
+
+def write_audit_sheet(path: Path, ids: list[str], sheet_path: Path = SHEET_PATH) -> None:
+    """Copy the chosen rows of the labeling sheet with an empty label column."""
+    wanted = set(ids)
+    with sheet_path.open(newline="", encoding="utf-8") as handle:
+        rows = [r for r in csv.DictReader(handle) if r["cell_id"] in wanted]
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(SHEET_COLUMNS)
+        writer.writerows([r[c] if c != "label" else "" for c in SHEET_COLUMNS] for r in rows)
+
+
+def write_final_labels(path: Path, labels: list[tuple[str, str, str]]) -> None:
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(["cell_id", "label", "source"])
+        writer.writerows(labels)
+
+
+def read_final_labels(path: Path = FINAL_LABELS_PATH) -> list[tuple[str, str]]:
+    """Return (cell_id, label) in sheet order."""
+    with path.open(newline="", encoding="utf-8") as handle:
+        return [(r["cell_id"], r["label"]) for r in csv.DictReader(handle)]

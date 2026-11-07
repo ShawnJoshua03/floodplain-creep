@@ -1,14 +1,15 @@
 import csv
 from pathlib import Path
 
-import pytest
-
 from pipeline.io.validation_files import (
     SHEET_COLUMNS,
     CellPlace,
     read_changes,
-    read_sheet_labels,
+    read_final_labels,
+    read_label_map,
+    write_audit_sheet,
     write_design,
+    write_final_labels,
     write_labeling_sheet,
 )
 from pipeline.lib.sampling import FLAGGED, RANDOM, SampledCell
@@ -36,33 +37,33 @@ def test_sheet_hides_prediction_and_sample_type(tmp_path: Path) -> None:
     assert rows[0]["earth_link"].startswith("https://earth.google.com/web/@23.750000,90.400000")
 
 
-def test_unlabeled_sheet_is_rejected(tmp_path: Path) -> None:
-    with pytest.raises(ValueError, match="no label yet"):
-        read_sheet_labels(write_sheet(tmp_path))
-
-
-def test_labeled_sheet_is_read_in_order(tmp_path: Path) -> None:
+def test_label_map_reads_only_filled_labels(tmp_path: Path) -> None:
     path = write_sheet(tmp_path)
-    path.write_text(path.read_text(encoding="utf-8").replace(",\r\n", ",increase\r\n", 1), encoding="utf-8", newline="")
+    assert read_label_map(path) == {}
     with path.open(newline="", encoding="utf-8") as handle:
         rows = list(csv.reader(handle))
     rows[1][-1] = "increase"
-    rows[2][-1] = "unclear"
     with path.open("w", newline="", encoding="utf-8") as handle:
         csv.writer(handle).writerows(rows)
-    assert read_sheet_labels(path) == [("r001c002", "increase"), ("r004c005", "unclear")]
+    assert read_label_map(path) == {"r001c002": "increase"}
+    assert read_label_map(tmp_path / "missing.csv") == {}
 
 
-def test_unknown_label_is_rejected(tmp_path: Path) -> None:
-    path = write_sheet(tmp_path)
-    with path.open(newline="", encoding="utf-8") as handle:
-        rows = list(csv.reader(handle))
-    rows[1][-1] = "growth"
-    rows[2][-1] = "increase"
-    with path.open("w", newline="", encoding="utf-8") as handle:
-        csv.writer(handle).writerows(rows)
-    with pytest.raises(ValueError, match="Unknown labels"):
-        read_sheet_labels(path)
+def test_audit_sheet_copies_chosen_rows_with_empty_labels(tmp_path: Path) -> None:
+    sheet = write_sheet(tmp_path)
+    audit = tmp_path / "audit.csv"
+    write_audit_sheet(audit, ["r004c005"], sheet)
+    with audit.open(newline="", encoding="utf-8") as handle:
+        rows = list(csv.DictReader(handle))
+    assert [r["cell_id"] for r in rows] == ["r004c005"]
+    assert rows[0]["label"] == ""
+    assert rows[0]["latitude"] == "23.760000"
+
+
+def test_final_labels_round_trip(tmp_path: Path) -> None:
+    path = tmp_path / "final.csv"
+    write_final_labels(path, [("a", "increase", "ai"), ("b", "decrease", "audit")])
+    assert read_final_labels(path) == [("a", "increase"), ("b", "decrease")]
 
 
 def test_design_round_trip(tmp_path: Path) -> None:

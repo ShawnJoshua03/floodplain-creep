@@ -1,20 +1,22 @@
 """Compute validation metrics from the labeled sheet.
 
 Run: uv run python -m pipeline.steps.evaluate_validation
-The first 60 percent of labels (sheet order) pick the change threshold. Metrics come from the rest.
+Labels come from final_labels.csv (run merge_labels first). The first 60 percent in sheet order
+pick the change threshold. Metrics come from the rest.
 """
 
 from __future__ import annotations
 
 from pipeline.io.validation_files import (
     DESIGN_PATH,
+    FINAL_LABELS_PATH,
+    LABEL_META_PATH,
     META_PATH,
     RESULT_PATH,
-    SHEET_PATH,
     load_validation_config,
     read_changes,
+    read_final_labels,
     read_json,
-    read_sheet_labels,
     write_json,
 )
 from pipeline.lib.validation_metrics import (
@@ -44,13 +46,14 @@ def main() -> None:
     if not settings.imagery_source.strip() or not settings.imagery_dates.strip():
         raise ValueError("Fill imagery_source and imagery_dates in config/validation.yaml before evaluating")
     changes = read_changes(DESIGN_PATH)
-    rows = read_sheet_labels(SHEET_PATH)
+    rows = read_final_labels(FINAL_LABELS_PATH)
     usable = [LabeledCell(cell_id, label, changes[cell_id]) for cell_id, label in rows if label != UNCLEAR]
     excluded = len(rows) - len(usable)
     tune, test = split_labeled(usable)
     threshold = tune_threshold(tune)
     result = confusion(test, threshold)
     meta = read_json(META_PATH)
+    label_meta = read_json(LABEL_META_PATH)
     write_json(
         RESULT_PATH,
         {
@@ -64,6 +67,8 @@ def main() -> None:
             "precision": estimate_dict(precision(result)),
             "recall": estimate_dict(recall(result)),
             "sampling_note": meta["sampling_note"],
+            "label_sources": label_meta["label_sources"],
+            "ai_human_agreement": label_meta["ai_human_agreement"],
             "imagery_source": settings.imagery_source,
             "imagery_dates": settings.imagery_dates,
             "start_year": meta["start_year"],

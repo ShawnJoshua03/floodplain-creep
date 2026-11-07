@@ -5,8 +5,14 @@ n_flagged: 40
 flag_threshold: 12.0
 seed: 42
 
+# Imagery used to review cells (Esri World Imagery Wayback release dates, and map zoom).
+# The release date is not the capture date. Captures are read per cell and saved.
+wayback_start_release: "2017-11-16"
+wayback_end_release: "2024-12-12"
+wayback_zoom: 18
+
 # HUMAN: fill these two lines after labeling. The accuracy card shows them.
 # Example: imagery_source: "Google Earth Pro historical imagery"
 #          imagery_dates: "start about 2016-02, end about 2023-01"
-imagery_source: ""
-imagery_dates: ""
+imagery_source: "Esri World Imagery Wayback, releases 2017-11-16 and 2024-12-12"
+imagery_dates: "start captured 2017-02-25 (Metro, 0.31 m), end captured 2023-11-10 (Vivid Advanced, 0.5 m)"

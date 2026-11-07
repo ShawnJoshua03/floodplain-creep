@@ -85,3 +85,17 @@ None yet.
 - The supplied Makefile calls `python3`. It stays on `uv run python` for the reason in the Tooling section.
 - `web/src/styles/` has a minimal `tokens.css`, `base.css`, `materials.css` and `motion.css`, imported in `main.tsx`. M6a fills in the full token set and the contrast test.
 - Design scratch-violation proof, each failing `make check` for the right reason: hex color outside tokens.css, gradient, raw 12px length, emoji, inline style, banned design package (`framer-motion`).
+
+## M3 labeling with an AI reviewer and a human audit
+- Why: labeling 140 cells by hand takes hours. The plan allows any dated imagery source, so labeling is split. Hand labeling the whole sheet stays the fallback.
+- Imagery: Esri World Imagery Wayback, releases 2017-11-16 and 2024-12-12. The release date is not the capture date. Capture dates are read per cell from the Wayback metadata layers and saved in `data/processed/labeling_captures.csv`. All 140 cells show the same captures: 2017-02-25 (Metro, 0.31 m) and 2023-11-10 (Vivid Advanced, 0.5 m). No 2016 capture exists in the archive for these cells that is closer than 2017-02-25 except 2015-03-22 (0.46 m).
+- Effect on the test: the building data compares 2016 with 2023, but the imagery starts in February 2017. Real change during 2016 and early 2017 is invisible to reviewers, so some algorithm increases will look like false positives. This needs weighing when reading precision.
+- Reviewer: Claude, from `data/processed/labeling_images/<cell>.png` (before and after, the 100 m square outlined, capture dates in the header). The reviewer did not see the algorithm's per-cell change values. It recorded a confidence per label in `ai_labels.csv`. Rubric: increase means clearly more buildings in the square at the end date, decrease means clearly fewer, no_clear_change means the same buildings or none (vegetation, water and field changes do not count).
+- AI labels (140): 50 increase, 87 no_clear_change, 3 decrease. 65 of the no_clear_change labels are low confidence, mostly dense areas where both images are full of roofs and a single added building is hard to see. Expect the reviewer to miss infill there.
+- Audit: a random 30 cells (`audit_sheet.csv`, seed + 1) go to a person to label blind. `merge_labels` gives a person's label priority over an audit label, and an audit label priority over an AI label. The result file records the label sources and the AI to human agreement with a Wilson interval.
+- If agreement is poor, label the full sheet by hand. A label typed in `labeling_sheet.csv` always wins.
+
+## M3 preliminary result (AI labels only, not audited, do not publish)
+- With 140 AI labels: threshold 0.18 buildings, test set 56 cells. Accuracy 0.34 (0.23 to 0.47), precision 0.30 (0.19 to 0.44), recall 0.88 (0.66 to 0.97). Confusion on the test set: 15 true positives, 35 false positives, 2 false negatives, 4 true negatives.
+- Reading: the algorithm calls almost every cell an increase, which fits the earlier finding that 62% of zone cells gain 2 or more buildings and that the 2016 baseline looks unstable. The F1-tuned threshold lands near zero for the same reason.
+- Caveats: unaudited labels, the 2017 imagery start, and a test set that includes oversampled flagged cells. Treat as a signal to investigate, not as the accuracy number.
