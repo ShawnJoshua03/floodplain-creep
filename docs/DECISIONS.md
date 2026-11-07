@@ -1,7 +1,7 @@
 # Decisions
 
 ## Human decisions (PLAN.md)
-- City: Nairobi (plan default).
+- City: Dhaka. Plan default was Nairobi, changed after M1 (see M1 finding).
 - SpaceXSI raffle: skipped (plan default). Building mainly with Claude Code.
 - Brief languages: English only (plan default). Translation is extension E3.
 
@@ -39,8 +39,9 @@ None yet.
 - Flood path: direct download from the JRC data store, six files for the Nairobi tile (about 77 MB).
 - Fetch steps print each raster. Run: `uv run python -m pipeline.steps.fetch_flood` and `uv run python -m pipeline.steps.fetch_buildings [year ...]`. One year takes about 3 minutes.
 
-## M1 finding: flood layer is empty in central Nairobi (needs a human decision)
-- Box 36.7525..36.8875 E, -1.3535..-1.2185 N: for RP10, RP50, RP100 and RP500 the only valid pixels are the same 24 as the permanent water layer, all with depth 1. No modeled river flooding.
-- Wider area is fine (about 66,500 flooded pixels at RP100 in 36.0..37.6 E, -2.2..-0.4 N), so the read is correct. The layer misses small urban channels, as the README and our "river flooding only" limit say.
-- Candidate boxes with flooding, ranked by flooded pixels at RP100 (permanent water and spurious depth excluded), within about 50 km of Nairobi: centre 37.07 E, -1.25 N (about 2,000 of 26,000 pixels, Ruiru / Juja corridor).
-- Options: move the box to that corridor, choose another city, or keep central Nairobi and accept an empty flood signal. None is chosen yet.
+## M1 finding and city change: Nairobi to Dhaka
+- Box 36.7525..36.8875 E, -1.3535..-1.2185 N: for RP10, RP50, RP100 and RP500 the only valid pixels were the same 24 as the permanent water layer, all with depth 1. No modeled river flooding. A wider window had about 66,500 flooded pixels, so the read was right and the layer misses small urban channels.
+- 16 cities were scanned for RP100 flooded pixels in a 15 km box. Dhaka centre box: 13,470 of 26,244 pixels.
+- Human chose Dhaka. Box 90.3425..90.4775 E, 23.7425..23.8775 N in `config/city.yaml`. The Nairobi building rasters were deleted.
+- Dhaka sanity check: buildings 390,221 (2016) to 523,511 (2023), +34%. Share of buildings in the RP100 zone 34.8% to 39.4%. The JRC layer marks about 57% of the box as flooded above 0.1 m, so the zone is wide. Read results with the 90 m and river-only limits in mind.
+- Boundaries: geoBoundaries ADM3 (thana level), because no open ward polygons were found. Neighbourhood means thana here.
