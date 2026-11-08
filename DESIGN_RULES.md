@@ -83,15 +83,13 @@ font. Nothing else defines them. Components use `var(--token)` only.
 
 - The map fills the viewport edge to edge. There is no page header and no frame around it.
 - One floating sheet holds all controls and data.
-  - Desktop (900 px and wider): the sheet sits at the left, inset by `--space-3`, 24rem wide,
+  - Desktop only. The sheet sits at the left, inset by `--space-3`, `--sheet-width` wide,
     with its own scroll. It uses the chrome material and `--radius-sheet`.
-  - Phone: a bottom sheet with two heights, collapsed and expanded, switched by a grabber
-    button. Drag gestures are not required.
+  - There is no phone or tablet layout. Design for 1280 px wide and up.
 - Inside the sheet, navigation is a stack: a root view, then detail views, each with a large
   title and a back button labeled with the previous title. Views slide at `--duration-base`.
   Focus moves to the new title after each push or pop.
-- The year scrubber floats at the bottom center of the map on desktop and above the collapsed
-  sheet on phone.
+- The year scrubber floats at the bottom center of the map.
 - One info button at the top right of the map opens the Limits dialog.
 - Everything is left aligned. Center only empty states.
 - Group sections are separated by `--space-6`. Rows are at least `--hit-target` tall.
@@ -144,7 +142,7 @@ placeholder text.
 
 Claude Code prepares the screenshots. The human decides. Run at the end of M6 and again at M8.
 
-1. Capture 1440 by 900 and 390 by 844, in dark mode: root view, neighborhood detail,
+1. Capture 1440 by 900, in dark mode: root view, neighborhood detail,
    accuracy detail, the Limits dialog, and the loading, error, and not-enough-data states.
    Save them in `docs/design-review/`. Use browser tools, not a new dependency.
 2. Squint test. Is the hierarchy still clear when blurred?

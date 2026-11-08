@@ -8,7 +8,6 @@ import { RootView } from "./RootView";
 export function SheetPanel({ onOpenLimits }: { onOpenLimits: () => void }) {
   const { focusName, city } = useSelection();
   const [accuracyOpen, setAccuracyOpen] = useState(false);
-  const [expanded, setExpanded] = useState(false);
 
   const views: NavView[] = [
     {
@@ -22,7 +21,7 @@ export function SheetPanel({ onOpenLimits }: { onOpenLimits: () => void }) {
     views.push({ key: "accuracy", title: "Accuracy", content: <AccuracyDetail /> });
   }
   return (
-    <Sheet label="Flood exposure" expanded={expanded} onToggleExpanded={() => setExpanded(!expanded)}>
+    <Sheet label="Flood exposure">
       <NavStack views={views} onBack={() => setAccuracyOpen(false)} />
     </Sheet>
   );

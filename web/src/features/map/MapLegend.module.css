@@ -26,9 +26,3 @@
   border-radius: var(--space-1);
   background: var(--map-water);
 }
-
-@media (max-width: 899px) {
-  .legend {
-    display: none;
-  }
-}

@@ -3,17 +3,12 @@ import styles from "./Sheet.module.css";
 
 interface SheetProps {
   label: string;
-  expanded: boolean;
-  onToggleExpanded: () => void;
   children: ReactNode;
 }
 
-export function Sheet({ label, expanded, onToggleExpanded, children }: SheetProps) {
+export function Sheet({ label, children }: SheetProps) {
   return (
-    <aside className={`${styles.sheet} chrome`} aria-label={label} data-expanded={expanded}>
-      <button type="button" className={styles.grabber} onClick={onToggleExpanded} aria-expanded={expanded}>
-        <span className="visually-hidden">{expanded ? "Collapse panel" : "Expand panel"}</span>
-      </button>
+    <aside className={`${styles.sheet} chrome`} aria-label={label}>
       <div className={styles.body}>{children}</div>
     </aside>
   );

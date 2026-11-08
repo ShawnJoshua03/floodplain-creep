@@ -34,11 +34,19 @@ interface MapViewProps {
   overlay: OverlayImage | null;
 }
 
-const DESKTOP_MIN_WIDTH = 900;
 const SHEET_PADDING_PX = 420;
 const EDGE_PADDING_PX = 48;
 const BOTTOM_PADDING_PX = 120;
 const EMPTY = { type: "FeatureCollection", features: [] } as const;
+
+function fitPadding() {
+  return {
+    top: EDGE_PADDING_PX,
+    right: EDGE_PADDING_PX,
+    bottom: EDGE_PADDING_PX + BOTTOM_PADDING_PX,
+    left: SHEET_PADDING_PX,
+  };
+}
 
 function imageCoordinates(bounds: number[]): [[number, number], [number, number], [number, number], [number, number]] {
   const [west = 0, south = 0, east = 0, north = 0] = bounds;
@@ -55,6 +63,7 @@ export function MapView({ label, name, geometry, water, overlay }: MapViewProps)
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const fitted = useRef(false);
+  const fittedToOverlay = useRef(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -110,16 +119,7 @@ export function MapView({ label, name, geometry, water, overlay }: MapViewProps)
     }
     if (!fitted.current) {
       fitted.current = true;
-      const wide = window.innerWidth >= DESKTOP_MIN_WIDTH;
-      map.fitBounds(box, {
-        duration: 0,
-        padding: {
-          top: EDGE_PADDING_PX,
-          right: EDGE_PADDING_PX,
-          bottom: wide ? EDGE_PADDING_PX + BOTTOM_PADDING_PX : SHEET_PADDING_PX,
-          left: wide ? SHEET_PADDING_PX : EDGE_PADDING_PX,
-        },
-      });
+      map.fitBounds(box, { duration: 0, padding: fitPadding() });
     }
     const element = document.createElement("div");
     element.className = `${styles.nameLabel} chrome`;
@@ -140,6 +140,11 @@ export function MapView({ label, name, geometry, water, overlay }: MapViewProps)
         map.removeLayer(OVERLAY_LAYER);
       }
       return;
+    }
+    if (!fittedToOverlay.current) {
+      fittedToOverlay.current = true;
+      const [west = 0, south = 0, east = 0, north = 0] = overlay.bounds;
+      map.fitBounds([west, south, east, north], { duration: 0, padding: fitPadding() });
     }
     const coordinates = imageCoordinates(overlay.bounds);
     const existing = map.getSource<ImageSource>(OVERLAY_SOURCE);

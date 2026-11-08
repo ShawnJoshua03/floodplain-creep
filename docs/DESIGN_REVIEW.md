@@ -14,7 +14,7 @@ The browser tool could not change the page viewport, so the viewport was about 1
 
 ## Not done yet
 
-- Phone captures at 390 by 844. Needs a real device or a browser with device emulation.
+- Phone layout is dropped. The app is desktop only.
 - Screenshots of the loading, error, and not-enough-data states. Each is covered by a test.
 - Squint and grayscale tests. A human looks at the screenshots.
 - A keyboard pass by a person.

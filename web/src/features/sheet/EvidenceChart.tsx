@@ -48,12 +48,7 @@ export function EvidenceChart({ points, band, selectedYear, caption }: EvidenceC
           </g>
         ))}
         {layout.band ? (
-          <>
-            <rect className={styles.band} x={FRAME.padLeft} width={right - FRAME.padLeft} y={layout.band.top} height={layout.band.height} />
-            <text className={styles.bandLabel} x={right - AXIS_GAP / 2} y={layout.band.top - AXIS_GAP / 2} textAnchor="end">
-              usual yearly swing
-            </text>
-          </>
+          <rect className={styles.band} x={FRAME.padLeft} width={right - FRAME.padLeft} y={layout.band.top} height={layout.band.height} />
         ) : null}
         {layout.ghostPaths.map((path) => (
           <path key={path} className={styles.ghost} d={path} />
@@ -81,6 +76,12 @@ export function EvidenceChart({ points, band, selectedYear, caption }: EvidenceC
           </text>
         ) : null}
       </svg>
+      {layout.band ? (
+        <p className={styles.key}>
+          <span className={styles.keySwatch} />
+          usual yearly swing
+        </p>
+      ) : null}
       <p className={styles.caption}>{caption}</p>
     </figure>
   );
