@@ -9,3 +9,5 @@ data/processed/
 web/node_modules/
 web/dist/
 *.pyc
+data/processed_backup/
+data/raw/buildings_oldbox/
