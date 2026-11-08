@@ -11,8 +11,8 @@ presence_threshold: 0.45
 min_depth_m: 0.1
 # A neighborhood is kept only if at least this share of its area lies inside the box.
 min_coverage: 0.5
-# Bounding box (lon_min, lat_min, lon_max, lat_max). About 15 km by 15 km around central Dhaka.
-bbox: [90.3425, 23.6925, 90.4775, 23.8275]
+# Bounding box (lon_min, lat_min, lon_max, lat_max). About 23 km by 33 km, most of Dhaka city.
+bbox: [90.30, 23.62, 90.53, 23.92]
 # A flood-zone cell counts as gaining (or losing) when its building count moves by at least this much.
 balance_threshold_buildings: 5
 # The one neighborhood the app shows. Other neighborhoods stay in the pipeline to measure typical noise.

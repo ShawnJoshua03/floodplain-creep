@@ -84,6 +84,18 @@ def write_overlay_files(overlay_dir: Path) -> None:
         "images": {"100": "depth_rp100.png"},
     }
     (overlay_dir / "overlays.json").write_text(json.dumps(manifest), encoding="utf-8")
+    (overlay_dir / "growth_rp100_2018.png").write_bytes((overlay_dir / "depth_rp100.png").read_bytes())
+    growth = {
+        "bounds": [90.34, 23.69, 90.47, 23.82],
+        "block_m": 500,
+        "return_periods": {
+            "100": {
+                "bins": [{"min_buildings": 20, "max_buildings": None, "color": "#ffd699"}],
+                "images": {"2018": "growth_rp100_2018.png"},
+            }
+        },
+    }
+    (overlay_dir / "growth.json").write_text(json.dumps(growth), encoding="utf-8")
     water = {"type": "MultiPolygon", "coordinates": [[[[90.4, 23.7], [90.41, 23.7], [90.41, 23.71], [90.4, 23.7]]]]}
     (overlay_dir / "context.json").write_text(json.dumps({"label": "Test water", "water": water}), encoding="utf-8")
 

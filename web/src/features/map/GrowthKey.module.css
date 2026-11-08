@@ -1,0 +1,44 @@
+.key {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--text-subhead);
+  line-height: var(--line-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.bins {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-footnote);
+  line-height: var(--line-footnote);
+}
+
+.bin {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.swatch {
+  flex: none;
+  width: var(--space-6);
+  height: var(--space-3);
+  border-radius: var(--space-1);
+  background: var(--bin-color);
+}
+
+.note {
+  margin: 0;
+  color: var(--label-secondary);
+  font-size: var(--text-caption);
+  line-height: var(--line-caption);
+}

@@ -38,6 +38,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/hazard/growth": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Growth */
+        get: operations["get_growth_hazard_growth_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/hazard/water": {
         parameters: {
             query?: never;
@@ -198,6 +215,35 @@ export interface components {
             noise: components["schemas"]["Noise"] | null;
             signal: components["schemas"]["Signal"];
             balance: components["schemas"]["Balance"] | null;
+        };
+        /** GrowthBin */
+        GrowthBin: {
+            /** Min Buildings */
+            min_buildings: number;
+            /** Max Buildings */
+            max_buildings: number | null;
+            /** Color */
+            color: string;
+        };
+        /**
+         * GrowthInfo
+         * @description Smoothed building density in the modeled flood zone, one image per year. Blocks under the minimum count are hidden.
+         */
+        GrowthInfo: {
+            /** Return Period */
+            return_period: number;
+            /** Bounds */
+            bounds: number[];
+            /** Block M */
+            block_m: number;
+            /** Bins */
+            bins: components["schemas"]["GrowthBin"][];
+            /** Image Urls */
+            image_urls: {
+                [key: string]: string;
+            };
+            /** Label */
+            label: string;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -439,6 +485,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OverlayInfo"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_growth_hazard_growth_get: {
+        parameters: {
+            query?: {
+                return_period?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GrowthInfo"];
                 };
             };
             /** @description Validation Error */

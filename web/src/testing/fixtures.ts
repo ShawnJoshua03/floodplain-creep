@@ -1,4 +1,4 @@
-import type { FocusView, Limits, OverlayInfo, ValidationResult } from "../api/types";
+import type { FocusView, GrowthInfo, Limits, OverlayInfo, ValidationResult } from "../api/types";
 
 const POLYGON = { type: "Polygon" as const, coordinates: [[[0, 0], [1, 0], [1, 1], [0, 0]]] };
 
@@ -52,6 +52,18 @@ export const OVERLAY: OverlayInfo = {
     { min_depth_m: 2, max_depth_m: null, color: "var(--ramp-depth-4)" },
   ],
   label: "Modeled river flood depth. Simulated scenario, not a forecast.",
+};
+
+export const GROWTH: GrowthInfo = {
+  return_period: 100,
+  bounds: [90.34, 23.69, 90.47, 23.82],
+  block_m: 500,
+  bins: [
+    { min_buildings: 20, max_buildings: 80, color: "var(--ramp-growth-1)" },
+    { min_buildings: 80, max_buildings: null, color: "var(--ramp-growth-4)" },
+  ],
+  image_urls: { "2018": "/overlays/growth_rp100_2018.png", "2023": "/overlays/growth_rp100_2023.png" },
+  label: "Buildings in the modeled flood zone, blended from blocks. Blocks with too few buildings are hidden.",
 };
 
 export const VALIDATION: ValidationResult = {

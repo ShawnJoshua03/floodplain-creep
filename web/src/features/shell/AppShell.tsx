@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { useFocus, useOverlay, useWater } from "../../api/hooks";
+import { useEffect, useMemo, useState } from "react";
+import { useFocus, useGrowth, useOverlay, useWater } from "../../api/hooks";
 import { Scrubber } from "../../components/Scrubber/Scrubber";
 import { formatCount } from "../../lib/format";
 import { useSelection } from "../../state/SelectionProvider";
@@ -18,6 +18,7 @@ export function AppShell() {
   const focus = useFocus(returnPeriod);
   const overlay = useOverlay(returnPeriod, overlayOn);
   const water = useWater();
+  const growth = useGrowth(returnPeriod);
   const [limitsOpen, setLimitsOpen] = useState(false);
   const firstYear = focus.data?.first_year ?? year;
   const lastYear = focus.data?.last_year ?? year;
@@ -28,6 +29,17 @@ export function AppShell() {
     () => (overlayOn && overlay.data ? { url: overlay.data.image_url, bounds: overlay.data.bounds } : null),
     [overlayOn, overlay.data],
   );
+  const mapTag = current === null ? `${focusName}, ${year}` : `${focusName}, ${year}: ${formatCount(current)} buildings`;
+  const growthUrls = growth.data?.image_urls;
+  useEffect(() => {
+    for (const url of Object.values(growthUrls ?? {})) {
+      new Image().src = url;
+    }
+  }, [growthUrls]);
+  const growthImage = useMemo(() => {
+    const url = growth.data?.image_urls[String(year)];
+    return growth.data && url ? { url, bounds: growth.data.bounds } : null;
+  }, [growth.data, year]);
   const announcement =
     current === null
       ? ""
@@ -37,12 +49,16 @@ export function AppShell() {
     <>
       <MapView
         label={MAP_LABEL}
-        name={focusName}
+        tag={mapTag}
         geometry={focus.data?.neighborhood.geometry ?? null}
         water={water.data?.geometry ?? null}
         overlay={overlayImage}
+        growth={growthImage}
       />
-      {overlayOn && overlay.data ? <MapLegend bins={overlay.data.bins} /> : null}
+      <MapLegend
+        depthBins={overlayOn && overlay.data ? overlay.data.bins : null}
+        growth={growth.data ? { bins: growth.data.bins, blockMeters: growth.data.block_m } : null}
+      />
       <InfoButton onPress={() => setLimitsOpen(true)} />
       <SheetPanel onOpenLimits={() => setLimitsOpen(true)} />
       <Scrubber

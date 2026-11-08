@@ -118,6 +118,19 @@ def test_the_focus_outline_says_how_much_of_the_neighborhood_is_covered(client: 
     assert focus(client)["neighborhood"]["coverage"] == 0.9
 
 
+def test_growth_is_served_as_images_with_no_cell_data(client: TestClient) -> None:
+    body = client.get("/hazard/growth", params={"return_period": 100}).json()
+    assert body["block_m"] == 500
+    assert body["image_urls"]["2018"] == "/overlays/growth_rp100_2018.png"
+    assert set(body) == {"return_period", "bounds", "block_m", "bins", "image_urls", "label"}
+    assert client.get(body["image_urls"]["2018"]).headers["content-type"] == "image/png"
+
+
+def test_growth_is_not_found_when_it_is_not_rendered(client: TestClient, tmp_path: Path) -> None:
+    (tmp_path / "overlays" / "growth.json").unlink()
+    assert client.get("/hazard/growth", params={"return_period": 100}).status_code == 404
+
+
 def test_water_is_served_for_orientation_and_holds_no_buildings(client: TestClient) -> None:
     body = client.get("/hazard/water").json()
     assert body["geometry"]["type"] == "MultiPolygon"

@@ -1,0 +1,7 @@
+.venv/
+web/node_modules/
+web/dist/
+data/
+.env
+.git/
+__pycache__/

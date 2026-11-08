@@ -1,0 +1,36 @@
+{
+  "bounds": [
+    90.3,
+    23.62,
+    90.53,
+    23.92
+  ],
+  "bins": [
+    {
+      "min_depth_m": 0.1,
+      "max_depth_m": 0.5,
+      "color": "#9ad8f0"
+    },
+    {
+      "min_depth_m": 0.5,
+      "max_depth_m": 1.0,
+      "color": "#4fb3e8"
+    },
+    {
+      "min_depth_m": 1.0,
+      "max_depth_m": 2.0,
+      "color": "#1f7fd1"
+    },
+    {
+      "min_depth_m": 2.0,
+      "max_depth_m": null,
+      "color": "#0a4fa8"
+    }
+  ],
+  "images": {
+    "10": "depth_rp10.png",
+    "50": "depth_rp50.png",
+    "100": "depth_rp100.png",
+    "500": "depth_rp500.png"
+  }
+}

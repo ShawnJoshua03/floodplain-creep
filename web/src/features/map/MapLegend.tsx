@@ -1,17 +1,24 @@
 import { DepthKey } from "./DepthKey";
+import { type GrowthBin, GrowthKey } from "./GrowthKey";
 import styles from "./MapLegend.module.css";
 
-interface Bin {
+interface DepthBin {
   min_depth_m: number;
   max_depth_m: number | null;
   color: string;
 }
 
-/** What the colors on the map mean, kept beside the map. Shown while flood depth is on. */
-export function MapLegend({ bins }: { bins: Bin[] }) {
+interface MapLegendProps {
+  depthBins: DepthBin[] | null;
+  growth: { bins: GrowthBin[]; blockMeters: number } | null;
+}
+
+/** What the colors on the map mean, kept beside the map. */
+export function MapLegend({ depthBins, growth }: MapLegendProps) {
   return (
     <aside className={`${styles.legend} chrome`} aria-label="Map legend">
-      <DepthKey bins={bins} />
+      {growth ? <GrowthKey bins={growth.bins} blockMeters={growth.blockMeters} /> : null}
+      {depthBins ? <DepthKey bins={depthBins} /> : null}
       <p className={styles.water}>
         <span className={styles.waterSwatch} />
         <span>River or lake, water all year</span>

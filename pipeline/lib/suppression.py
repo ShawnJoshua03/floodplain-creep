@@ -9,6 +9,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+import numpy as np
+import numpy.typing as npt
+
 from pipeline.lib.aggregation import ZoneTotal
 from pipeline.lib.balance import RawBalance
 
@@ -90,3 +93,8 @@ def suppress_balance(raw: list[RawBalance], k: int) -> list[BalanceRow]:
                 )
             )
     return rows
+
+
+def suppress_blocks(block_sums: npt.NDArray[np.float64], k: int) -> npt.NDArray[np.bool_]:
+    """True where a map block may be drawn. A block with fewer than K buildings in the flood zone is hidden."""
+    return np.round(block_sums) >= k

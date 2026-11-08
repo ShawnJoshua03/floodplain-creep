@@ -17,6 +17,7 @@ CELL_LEVEL_WORDS = {"cell", "row", "col", "lat", "lon", "latitude", "longitude",
 ALLOWED_PATHS = {
     "/focus",
     "/hazard/overlay",
+    "/hazard/growth",
     "/hazard/water",
     "/overlays/{filename}",
     "/validation",
@@ -26,6 +27,7 @@ ALLOWED_PATHS = {
 ENDPOINTS = [
     "/focus?return_period=100",
     "/hazard/overlay?return_period=100",
+    "/hazard/growth?return_period=100",
     "/hazard/water",
     "/validation",
     "/limits",

@@ -1,0 +1,11 @@
+{
+  "return_period": 100,
+  "eligible_cells": 6912,
+  "n_random": 100,
+  "n_flagged": 40,
+  "flag_threshold": 12.0,
+  "seed": 42,
+  "start_year": 2018,
+  "end_year": 2023,
+  "sampling_note": "Cells are 100 m squares inside the modeled 100-year flood zone and inside a kept neighborhood (6912 cells). The sample has 100 cells drawn at random, plus 40 extra cells drawn at random from the 1940 cells where the algorithm shows an increase of at least 12 buildings between the first and last year, so that enough real increases are present. Because of this oversampling, precision and recall describe this sample, not the whole city. Random seed 42. The 40 extra cells were chosen with the change between 2016 and 2023, before the baseline moved to 2018. Change is now measured between 2018 and 2023, so the extra cells are not guaranteed to show an increase under the new baseline."
+}

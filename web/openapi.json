@@ -85,6 +85,46 @@
         }
       }
     },
+    "/hazard/growth": {
+      "get": {
+        "summary": "Get Growth",
+        "operationId": "get_growth_hazard_growth_get",
+        "parameters": [
+          {
+            "name": "return_period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 100,
+              "title": "Return Period"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GrowthInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/hazard/water": {
       "get": {
         "summary": "Get Water",
@@ -422,6 +462,84 @@
           "balance"
         ],
         "title": "FocusView"
+      },
+      "GrowthBin": {
+        "properties": {
+          "min_buildings": {
+            "type": "integer",
+            "title": "Min Buildings"
+          },
+          "max_buildings": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Buildings"
+          },
+          "color": {
+            "type": "string",
+            "title": "Color"
+          }
+        },
+        "type": "object",
+        "required": [
+          "min_buildings",
+          "max_buildings",
+          "color"
+        ],
+        "title": "GrowthBin"
+      },
+      "GrowthInfo": {
+        "properties": {
+          "return_period": {
+            "type": "integer",
+            "title": "Return Period"
+          },
+          "bounds": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Bounds"
+          },
+          "block_m": {
+            "type": "integer",
+            "title": "Block M"
+          },
+          "bins": {
+            "items": {
+              "$ref": "#/components/schemas/GrowthBin"
+            },
+            "type": "array",
+            "title": "Bins"
+          },
+          "image_urls": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Image Urls"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "return_period",
+          "bounds",
+          "block_m",
+          "bins",
+          "image_urls",
+          "label"
+        ],
+        "title": "GrowthInfo",
+        "description": "Smoothed building density in the modeled flood zone, one image per year. Blocks under the minimum count are hidden."
       },
       "HTTPValidationError": {
         "properties": {

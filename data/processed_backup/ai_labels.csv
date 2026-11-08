@@ -1,0 +1,141 @@
+cell_id,label,confidence,note
+r116c124,no_clear_change,high,field to water
+r088c017,no_clear_change,high,tree nursery both dates
+r084c115,no_clear_change,low,"buildings already present in 2018, similar density"
+r115c019,no_clear_change,low,dense both dates
+r059c097,no_clear_change,low,dense both dates
+r006c116,increase,high,bare field grid to multi-storey buildings
+r070c090,increase,high,few buildings to dense new rows
+r034c139,no_clear_change,low,small cluster in trees both dates
+r026c100,no_clear_change,low,dense both dates
+r069c099,increase,high,two buildings and bare land to dense towers
+r036c125,no_clear_change,high,"same building, bare lot and pond"
+r037c095,no_clear_change,low,dense both dates
+r034c099,no_clear_change,low,"dense both dates, taller blocks"
+r126c042,decrease,medium,roofs cleared for construction
+r054c104,no_clear_change,high,"field, small hut both dates"
+r049c127,no_clear_change,high,field both dates
+r062c014,no_clear_change,low,dense both dates
+r072c011,no_clear_change,low,dense mid-rise both dates
+r122c035,no_clear_change,low,dense both dates
+r101c114,no_clear_change,low,building cluster both dates
+r080c130,no_clear_change,medium,"small buildings both dates, field to ponds"
+r017c041,increase,medium,green gap filled with roofs
+r010c099,increase,high,sparse buildings to dense towers
+r116c026,no_clear_change,low,dense both dates
+r131c033,no_clear_change,low,dense both dates
+r106c024,no_clear_change,low,large industrial roofs both dates
+r058c113,no_clear_change,high,sand and water to dry marsh
+r023c119,increase,medium,bare plots gain a building
+r142c126,no_clear_change,low,"roofs and pond both dates, one new white roof"
+r142c122,no_clear_change,low,mixed roofs both dates
+r109c101,no_clear_change,low,dense both dates
+r101c015,no_clear_change,low,"lot with buildings both dates, brick stacks added"
+r116c114,no_clear_change,high,flooded field to wet field
+r010c121,increase,high,bare field grid to tower under construction
+r080c132,no_clear_change,medium,fields to ponds
+r015c041,increase,medium,warehouses to denser multi-storey and new roofs
+r070c093,increase,medium,mid-rise cluster to dense rows
+r019c092,no_clear_change,low,dense towers both dates
+r013c048,no_clear_change,low,pond and dense area
+r034c092,no_clear_change,low,dense both dates
+r044c097,no_clear_change,low,factory roofs both dates
+r069c136,no_clear_change,high,field both dates
+r087c023,no_clear_change,low,dense both dates
+r134c121,no_clear_change,low,dense with trees both dates
+r136c116,no_clear_change,low,dense both dates
+r048c102,increase,medium,pond area gets walled building
+r074c110,increase,high,few buildings to towers
+r119c109,no_clear_change,high,water and landfill
+r105c106,increase,high,field with huts to large white building
+r020c097,increase,medium,school plus new white building inside
+r119c027,no_clear_change,low,dense both dates
+r040c125,no_clear_change,low,fields ponds few buildings
+r011c057,no_clear_change,low,dense both dates
+r086c097,no_clear_change,low,dense both dates
+r098c021,no_clear_change,low,"low roofs to taller blocks, hard to count"
+r117c020,no_clear_change,low,dense with trees both dates
+r143c122,no_clear_change,low,dense roofs and pond both dates
+r080c009,increase,high,bare land with two buildings to several towers
+r014c057,no_clear_change,medium,"school buildings both dates, pond to green"
+r035c010,no_clear_change,low,dense both dates
+r121c027,no_clear_change,low,dense both dates
+r053c106,no_clear_change,high,flooded field to lake
+r009c123,no_clear_change,high,plot grid overgrown
+r009c038,no_clear_change,low,dense both dates
+r018c110,increase,high,cleared plots to building under construction
+r112c019,increase,low,open plaza and trees to buildings
+r078c085,no_clear_change,low,dense both dates
+r054c010,increase,high,wetland to new warehouses
+r029c092,no_clear_change,low,dense both dates
+r104c025,no_clear_change,low,dense both dates
+r053c007,no_clear_change,low,dense both dates
+r071c100,increase,high,construction site and few buildings to dense towers
+r095c108,no_clear_change,low,dense with trees both dates
+r055c095,no_clear_change,low,dense roofs both dates
+r043c090,increase,medium,open yard partly built
+r011c013,no_clear_change,high,pond both dates
+r113c116,no_clear_change,medium,"sand to green plots, one small walled plot"
+r016c049,no_clear_change,low,"buildings both dates, pond filled"
+r092c012,increase,medium,open lot and red earth to buildings
+r103c103,no_clear_change,low,"dense both dates, green patch built over is small"
+r066c095,no_clear_change,medium,"pond and cleared ground, no new roof"
+r004c103,increase,high,field to dense towers
+r088c021,no_clear_change,low,industrial roofs both dates
+r078c107,increase,high,construction site to dense towers
+r125c022,no_clear_change,low,dense both dates
+r036c006,increase,medium,new mosque in cemetery
+r064c009,no_clear_change,low,"low roofs to mid-rise, hard to count"
+r130c102,no_clear_change,low,dense both dates
+r114c098,no_clear_change,low,dense both dates
+r055c005,no_clear_change,high,pond and overgrowth
+r042c105,increase,high,few buildings to large construction and roofs
+r052c112,no_clear_change,high,field to lake
+r120c021,no_clear_change,low,dense both dates
+r105c104,increase,high,green land and few buildings to tall white buildings
+r070c116,increase,medium,plot grid gets a new building
+r083c092,no_clear_change,low,dense both dates
+r104c100,no_clear_change,low,dense both dates
+r112c100,no_clear_change,low,dense both dates
+r089c105,increase,medium,open green area gets new tall building
+r043c103,no_clear_change,low,dense both dates
+r017c053,no_clear_change,low,dense low-rise both dates
+r115c024,no_clear_change,low,dense both dates
+r081c123,no_clear_change,medium,small compound both dates
+r019c139,no_clear_change,high,bare land to road and fields
+r014c038,no_clear_change,low,dense both dates
+r125c024,no_clear_change,low,dense both dates
+r025c050,no_clear_change,low,dense low-rise both dates
+r068c098,increase,medium,scattered small structures to larger buildings
+r098c112,no_clear_change,low,low density with trees both dates
+r053c125,no_clear_change,high,field to sand and water
+r058c010,no_clear_change,low,dense both dates
+r128c034,no_clear_change,low,dense both dates
+r079c125,no_clear_change,low,river with trees and houses both dates
+r023c096,no_clear_change,low,dense both dates
+r111c099,no_clear_change,low,dense both dates
+r087c012,increase,medium,bare lot gains a large new building
+r126c124,no_clear_change,low,dense both dates
+r055c026,no_clear_change,low,dense both dates
+r072c097,no_clear_change,low,"mixed buildings both dates, taller now"
+r016c130,increase,medium,plot grid gains a building
+r135c069,decrease,low,large buildings replaced by low roofs and green
+r090c019,no_clear_change,low,large roofs both dates
+r130c043,no_clear_change,low,dense both dates
+r120c033,no_clear_change,low,dense both dates
+r057c124,no_clear_change,high,field to sand fill
+r031c006,no_clear_change,low,dense roofs both dates
+r043c104,no_clear_change,low,industrial roofs to mid-rise
+r011c097,no_clear_change,low,mid-rise both dates
+r043c126,increase,medium,scrub gets walled plots and a building
+r134c131,no_clear_change,low,"dense both dates, construction site in 2018"
+r109c108,no_clear_change,low,"buildings both dates, site cleared"
+r128c109,no_clear_change,low,large roofs both dates
+r118c108,no_clear_change,high,lake with pylon
+r128c114,increase,medium,trees and small buildings to large commercial roofs
+r011c044,increase,medium,clearing gets building under construction
+r008c113,increase,high,plot grid gets several buildings
+r046c121,no_clear_change,low,sand to plots with a small shed
+r085c097,increase,medium,new tall building in mixed area
+r023c127,decrease,high,village cleared to bare sand
+r124c031,no_clear_change,low,dense both dates

@@ -1,7 +1,7 @@
 /* Every color, size, radius, duration, shadow and font lives here. Dark only. */
 :root {
   color-scheme: dark;
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Segoe UI", sans-serif;
 
   /* Surfaces */
   --bg: #000000;
@@ -28,6 +28,10 @@
   --ramp-depth-2: #4fb3e8;
   --ramp-depth-3: #1f7fd1;
   --ramp-depth-4: #0a4fa8;
+  --ramp-growth-1: #ffd699;
+  --ramp-growth-2: #ff9f40;
+  --ramp-growth-3: #e65c24;
+  --ramp-growth-4: #b02618;
 
   /* Type */
   --text-large-title: 2.125rem;
@@ -44,8 +48,8 @@
   --line-footnote: 1.4;
   --text-caption: 0.75rem;
   --line-caption: 1.35;
-  --weight-regular: 400;
-  --weight-semibold: 600;
+  --weight-regular: 700;
+  --weight-semibold: 700;
 
   /* Space */
   --space-1: 0.25rem;

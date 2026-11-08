@@ -1,0 +1,139 @@
+{
+  "bounds": [
+    90.3,
+    23.62,
+    90.53,
+    23.92
+  ],
+  "block_m": 500,
+  "return_periods": {
+    "10": {
+      "bins": [
+        {
+          "min_buildings": 20,
+          "max_buildings": 85,
+          "color": "#ffd699"
+        },
+        {
+          "min_buildings": 85,
+          "max_buildings": 265,
+          "color": "#ff9f40"
+        },
+        {
+          "min_buildings": 265,
+          "max_buildings": 772,
+          "color": "#e65c24"
+        },
+        {
+          "min_buildings": 772,
+          "max_buildings": null,
+          "color": "#b02618"
+        }
+      ],
+      "images": {
+        "2018": "growth_rp10_2018.png",
+        "2019": "growth_rp10_2019.png",
+        "2020": "growth_rp10_2020.png",
+        "2021": "growth_rp10_2021.png",
+        "2022": "growth_rp10_2022.png",
+        "2023": "growth_rp10_2023.png"
+      }
+    },
+    "50": {
+      "bins": [
+        {
+          "min_buildings": 20,
+          "max_buildings": 97,
+          "color": "#ffd699"
+        },
+        {
+          "min_buildings": 97,
+          "max_buildings": 328,
+          "color": "#ff9f40"
+        },
+        {
+          "min_buildings": 328,
+          "max_buildings": 896,
+          "color": "#e65c24"
+        },
+        {
+          "min_buildings": 896,
+          "max_buildings": null,
+          "color": "#b02618"
+        }
+      ],
+      "images": {
+        "2018": "growth_rp50_2018.png",
+        "2019": "growth_rp50_2019.png",
+        "2020": "growth_rp50_2020.png",
+        "2021": "growth_rp50_2021.png",
+        "2022": "growth_rp50_2022.png",
+        "2023": "growth_rp50_2023.png"
+      }
+    },
+    "100": {
+      "bins": [
+        {
+          "min_buildings": 20,
+          "max_buildings": 99,
+          "color": "#ffd699"
+        },
+        {
+          "min_buildings": 99,
+          "max_buildings": 340,
+          "color": "#ff9f40"
+        },
+        {
+          "min_buildings": 340,
+          "max_buildings": 913,
+          "color": "#e65c24"
+        },
+        {
+          "min_buildings": 913,
+          "max_buildings": null,
+          "color": "#b02618"
+        }
+      ],
+      "images": {
+        "2018": "growth_rp100_2018.png",
+        "2019": "growth_rp100_2019.png",
+        "2020": "growth_rp100_2020.png",
+        "2021": "growth_rp100_2021.png",
+        "2022": "growth_rp100_2022.png",
+        "2023": "growth_rp100_2023.png"
+      }
+    },
+    "500": {
+      "bins": [
+        {
+          "min_buildings": 20,
+          "max_buildings": 106,
+          "color": "#ffd699"
+        },
+        {
+          "min_buildings": 106,
+          "max_buildings": 361,
+          "color": "#ff9f40"
+        },
+        {
+          "min_buildings": 361,
+          "max_buildings": 972,
+          "color": "#e65c24"
+        },
+        {
+          "min_buildings": 972,
+          "max_buildings": null,
+          "color": "#b02618"
+        }
+      ],
+      "images": {
+        "2018": "growth_rp500_2018.png",
+        "2019": "growth_rp500_2019.png",
+        "2020": "growth_rp500_2020.png",
+        "2021": "growth_rp500_2021.png",
+        "2022": "growth_rp500_2022.png",
+        "2023": "growth_rp500_2023.png"
+      }
+    }
+  }
+}
