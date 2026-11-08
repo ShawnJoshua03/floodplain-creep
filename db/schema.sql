@@ -46,3 +46,21 @@ CREATE TABLE IF NOT EXISTS briefs (
     created_at timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (neighborhood_id, return_period)
 );
+
+-- Cell counts per neighborhood, never cell positions. A row with a null neighborhood_id is the whole study area.
+CREATE TABLE IF NOT EXISTS neighborhood_change_balance (
+    neighborhood_id text REFERENCES neighborhoods (neighborhood_id),
+    return_period integer NOT NULL CHECK (return_period IN (10, 20, 50, 75, 100, 200, 500)),
+    cells_in_zone integer,
+    cells_gaining integer,
+    cells_losing integer,
+    suppressed boolean NOT NULL,
+    CONSTRAINT suppressed_balance_holds_no_counts CHECK (
+        NOT suppressed OR (cells_in_zone IS NULL AND cells_gaining IS NULL AND cells_losing IS NULL)
+    ),
+    CONSTRAINT shown_balance_holds_counts CHECK (suppressed OR cells_in_zone IS NOT NULL),
+    CONSTRAINT study_area_is_never_suppressed CHECK (neighborhood_id IS NOT NULL OR NOT suppressed)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS balance_one_row_per_area
+    ON neighborhood_change_balance (COALESCE(neighborhood_id, ''), return_period);

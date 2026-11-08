@@ -1,4 +1,4 @@
-import { baseStyle, fillColor, neighborhoodLayers, selectedFilter, SELECTED_LAYER, SUPPRESSED_LAYER } from "./mapStyle";
+import { baseStyle, fillColor, fillOpacity, focusLayers, OUTLINE_LAYER } from "./mapStyle";
 import type { Palette } from "./readPalette";
 
 const palette: Palette = {
@@ -15,25 +15,18 @@ describe("mapStyle", () => {
     expect(baseStyle(palette).sources).toEqual({});
   });
 
-  it("maps each bucket to its ramp color and falls back to the no-data fill", () => {
-    expect(fillColor(palette)).toEqual([
-      "match",
-      ["coalesce", ["feature-state", "bucket"], 0],
-      1, "e1", 2, "e2", 3, "e3", 4, "e4", 5, "e5",
-      "nodata",
-    ]);
+  it("reads the exposure ramp by bucket and uses the no-data fill for bucket 0", () => {
+    expect(fillColor(palette, 1)).toBe("e1");
+    expect(fillColor(palette, 5)).toBe("e5");
+    expect(fillColor(palette, 0)).toBe("nodata");
   });
 
-  it("draws a dashed outline only for suppressed neighborhoods and a selection outline", () => {
-    const layers = neighborhoodLayers(palette);
-    const suppressed = layers.find((layer) => layer.id === SUPPRESSED_LAYER);
-    expect(suppressed?.paint).toMatchObject({ "line-dasharray": [2, 2] });
-    expect(JSON.stringify(suppressed?.paint)).toContain("feature-state");
-    expect(layers.some((layer) => layer.id === SELECTED_LAYER)).toBe(true);
+  it("dims the fill while the depth overlay is on", () => {
+    expect(fillOpacity(true)).toBeLessThan(fillOpacity(false));
   });
 
-  it("matches no neighborhood when nothing is selected", () => {
-    expect(selectedFilter(null)).toEqual(["==", ["get", "neighborhood_id"], ""]);
-    expect(selectedFilter("n1")).toEqual(["==", ["get", "neighborhood_id"], "n1"]);
+  it("outlines the neighborhood in the accent color", () => {
+    const outline = focusLayers(palette, 3, false).find((layer) => layer.id === OUTLINE_LAYER);
+    expect(outline?.paint).toMatchObject({ "line-color": "accent" });
   });
 });

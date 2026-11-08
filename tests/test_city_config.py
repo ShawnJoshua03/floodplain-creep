@@ -14,6 +14,9 @@ grid_size_m: 100
 presence_threshold: 0.45
 min_depth_m: 0.1
 min_coverage: 0.5
+balance_threshold_buildings: 5
+focus_neighborhood: Test
+signal_noise_multiple: 2
 """
 
 

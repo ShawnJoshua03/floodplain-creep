@@ -1,28 +1,12 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { getJson, isNotFound } from "./client";
-import type {
-  Brief,
-  CitySummary,
-  Limits,
-  NeighborhoodCollection,
-  OverlayInfo,
-  ValidationResult,
-} from "./types";
+import type { Brief, FocusView, Limits, OverlayInfo, ValidationResult } from "./types";
 
-export function useCitySummary(returnPeriod: number) {
+/** No placeholder data: a new scenario shows a loading state, never the previous scenario's numbers. */
+export function useFocus(returnPeriod: number) {
   return useQuery({
-    queryKey: ["city-summary", returnPeriod],
-    queryFn: ({ signal }) => getJson<CitySummary>("/city/summary", { return_period: returnPeriod }, signal),
-    placeholderData: keepPreviousData,
-  });
-}
-
-export function useNeighborhoods(returnPeriod: number, year: number) {
-  return useQuery({
-    queryKey: ["neighborhoods", returnPeriod, year],
-    queryFn: ({ signal }) =>
-      getJson<NeighborhoodCollection>("/neighborhoods", { return_period: returnPeriod, year }, signal),
-    placeholderData: keepPreviousData,
+    queryKey: ["focus", returnPeriod],
+    queryFn: ({ signal }) => getJson<FocusView>("/focus", { return_period: returnPeriod }, signal),
   });
 }
 
@@ -50,12 +34,12 @@ export function useLimits(enabled: boolean) {
 }
 
 /** A missing brief is a normal answer, so it resolves to null instead of an error. */
-export function useBrief(neighborhoodId: string, returnPeriod: number) {
+export function useBrief(returnPeriod: number) {
   return useQuery({
-    queryKey: ["brief", neighborhoodId, returnPeriod],
+    queryKey: ["brief", returnPeriod],
     queryFn: async ({ signal }) => {
       try {
-        return await getJson<Brief>(`/brief/${neighborhoodId}`, { return_period: returnPeriod }, signal);
+        return await getJson<Brief>("/brief", { return_period: returnPeriod }, signal);
       } catch (error) {
         if (isNotFound(error)) {
           return null;

@@ -1,4 +1,4 @@
-"""SQL for stored briefs and neighborhood lookups."""
+"""SQL for stored briefs."""
 
 from __future__ import annotations
 
@@ -15,8 +15,3 @@ def fetch_brief(conn: psycopg.Connection, neighborhood_id: str, return_period: i
             " WHERE neighborhood_id = %s AND return_period = %s",
             (neighborhood_id, return_period),
         ).fetchone()
-
-
-def neighborhood_exists(conn: psycopg.Connection, neighborhood_id: str) -> bool:
-    row = conn.execute("SELECT 1 FROM neighborhoods WHERE neighborhood_id = %s", (neighborhood_id,)).fetchone()
-    return row is not None

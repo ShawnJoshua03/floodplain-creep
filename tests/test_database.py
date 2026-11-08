@@ -120,6 +120,12 @@ def test_no_table_holds_cell_level_columns(conn: psycopg.Connection) -> None:
     found = conn.execute(
         "SELECT table_name, column_name FROM information_schema.columns WHERE table_schema = %s", (schema[0],)
     ).fetchall()
-    assert {t for t, _ in found} == {"neighborhoods", "neighborhood_year_exposure", "validation_result", "briefs"}
+    assert {t for t, _ in found} == {
+        "neighborhoods",
+        "neighborhood_year_exposure",
+        "validation_result",
+        "briefs",
+        "neighborhood_change_balance",
+    }
     for table, column in found:
         assert not CELL_LEVEL_WORDS.intersection(re.split(r"_", column)), (table, column)

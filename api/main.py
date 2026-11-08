@@ -10,7 +10,7 @@ from psycopg_pool import ConnectionPool
 
 from api.core.errors import register_error_handlers
 from api.core.settings import Settings, load_settings
-from api.routers import exposure, reference
+from api.routers import focus, reference
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -28,7 +28,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app = FastAPI(title="Floodplain Creep", lifespan=lifespan)
     register_error_handlers(app)
-    app.include_router(exposure.router)
+    app.include_router(focus.router)
     app.include_router(reference.router)
     return app
 

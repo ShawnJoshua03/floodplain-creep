@@ -2,28 +2,25 @@ import { type GeoJSONSource, type ImageSource, Map as MapLibreMap } from "maplib
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useState } from "react";
 import { boundsOf } from "../../lib/geometryBounds";
-import { configureMapWorker } from "./mapWorker";
 import styles from "./MapView.module.css";
 import {
   baseStyle,
   FILL_LAYER,
-  FILL_OPACITY,
-  FILL_OPACITY_UNDER_OVERLAY,
-  ID_PROPERTY,
-  neighborhoodLayers,
+  fillColor,
+  fillOpacity,
+  focusLayers,
+  OUTLINE_LAYER,
   OVERLAY_LAYER,
   OVERLAY_SOURCE,
   overlayLayer,
-  SELECTED_LAYER,
-  SEPARATOR_LAYER,
-  selectedFilter,
   SOURCE_ID,
 } from "./mapStyle";
-import { readPalette } from "./readPalette";
+import { configureMapWorker } from "./mapWorker";
+import { type Palette, readPalette } from "./readPalette";
 
-export interface MapGeometry {
-  id: string;
-  geometry: { type: "Polygon" | "MultiPolygon"; coordinates: number[][][] | number[][][][] };
+interface MapGeometry {
+  type: "Polygon" | "MultiPolygon";
+  coordinates: number[][][] | number[][][][];
 }
 
 interface OverlayImage {
@@ -33,12 +30,9 @@ interface OverlayImage {
 
 interface MapViewProps {
   label: string;
-  geometries: MapGeometry[];
-  buckets: Record<string, number>;
-  selectedId: string | null;
+  geometry: MapGeometry | null;
+  bucket: number;
   overlay: OverlayImage | null;
-  onSelect: (id: string | null) => void;
-  onHover: (id: string | null) => void;
 }
 
 const DESKTOP_MIN_WIDTH = 900;
@@ -57,26 +51,23 @@ function imageCoordinates(bounds: number[]): [[number, number], [number, number]
 }
 
 /** The only file that calls the map library. The map is driven from props through a ref. */
-export function MapView({ label, geometries, buckets, selectedId, overlay, onSelect, onHover }: MapViewProps) {
+export function MapView({ label, geometry, bucket, overlay }: MapViewProps) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
-  const handlers = useRef({ onSelect, onHover });
+  const palette = useRef<Palette | null>(null);
   const fitted = useRef(false);
   const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    handlers.current = { onSelect, onHover };
-  }, [onSelect, onHover]);
 
   useEffect(() => {
     if (!container.current) {
       return undefined;
     }
     configureMapWorker();
-    const palette = readPalette();
+    const colors = readPalette();
+    palette.current = colors;
     const map = new MapLibreMap({
       container: container.current,
-      style: baseStyle(palette),
+      style: baseStyle(colors),
       center: [0, 0],
       zoom: 1,
       attributionControl: false,
@@ -85,26 +76,10 @@ export function MapView({ label, geometries, buckets, selectedId, overlay, onSel
     });
     mapRef.current = map;
     map.on("load", () => {
-      map.addSource(SOURCE_ID, {
-        type: "geojson",
-        data: { type: "FeatureCollection", features: [] },
-        promoteId: ID_PROPERTY,
-      });
-      for (const layer of neighborhoodLayers(palette)) {
+      map.addSource(SOURCE_ID, { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+      for (const layer of focusLayers(colors, 0, false)) {
         map.addLayer(layer);
       }
-      map.on("click", (event) => {
-        const hit = map.queryRenderedFeatures(event.point, { layers: [FILL_LAYER] })[0];
-        const id = hit?.properties?.[ID_PROPERTY];
-        handlers.current.onSelect(typeof id === "string" ? id : null);
-      });
-      map.on("mousemove", (event) => {
-        const hit = map.queryRenderedFeatures(event.point, { layers: [FILL_LAYER] })[0];
-        const id = hit?.properties?.[ID_PROPERTY];
-        map.getCanvas().style.cursor = hit ? "pointer" : "";
-        handlers.current.onHover(typeof id === "string" ? id : null);
-      });
-      map.on("mouseout", () => handlers.current.onHover(null));
       setReady(true);
     });
     return () => {
@@ -117,18 +92,11 @@ export function MapView({ label, geometries, buckets, selectedId, overlay, onSel
   useEffect(() => {
     const map = mapRef.current;
     const source = ready ? map?.getSource<GeoJSONSource>(SOURCE_ID) : undefined;
-    if (!map || !source || geometries.length === 0) {
+    if (!map || !source || !geometry) {
       return;
     }
-    source.setData({
-      type: "FeatureCollection",
-      features: geometries.map(({ id, geometry }) => ({
-        type: "Feature",
-        properties: { [ID_PROPERTY]: id },
-        geometry,
-      })),
-    });
-    const box = boundsOf(geometries.map(({ geometry }) => geometry));
+    source.setData({ type: "Feature", properties: {}, geometry });
+    const box = boundsOf([geometry]);
     if (box && !fitted.current) {
       fitted.current = true;
       const wide = window.innerWidth >= DESKTOP_MIN_WIDTH;
@@ -142,41 +110,24 @@ export function MapView({ label, geometries, buckets, selectedId, overlay, onSel
         },
       });
     }
-  }, [geometries, ready]);
+  }, [geometry, ready]);
 
+  const overlayOn = overlay !== null;
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !ready) {
-      return undefined;
+    const colors = palette.current;
+    if (!map || !colors || !ready) {
+      return;
     }
-    const apply = () => {
-      for (const [id, bucket] of Object.entries(buckets)) {
-        map.setFeatureState({ source: SOURCE_ID, id }, { bucket });
-      }
-    };
-    if (map.isStyleLoaded()) {
-      apply();
-      return undefined;
-    }
-    map.once("idle", apply);
-    return () => {
-      map.off("idle", apply);
-    };
-  }, [buckets, geometries, ready]);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    if (map && ready) {
-      map.setFilter(SELECTED_LAYER, selectedFilter(selectedId));
-    }
-  }, [selectedId, ready]);
+    map.setPaintProperty(FILL_LAYER, "fill-color", fillColor(colors, bucket));
+    map.setPaintProperty(FILL_LAYER, "fill-opacity", fillOpacity(overlayOn));
+  }, [bucket, overlayOn, ready]);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !ready) {
       return;
     }
-    map.setPaintProperty(FILL_LAYER, "fill-opacity", overlay ? FILL_OPACITY_UNDER_OVERLAY : FILL_OPACITY);
     if (!overlay) {
       if (map.getLayer(OVERLAY_LAYER)) {
         map.removeLayer(OVERLAY_LAYER);
@@ -191,7 +142,7 @@ export function MapView({ label, geometries, buckets, selectedId, overlay, onSel
       map.addSource(OVERLAY_SOURCE, { type: "image", url: overlay.url, coordinates });
     }
     if (!map.getLayer(OVERLAY_LAYER)) {
-      map.addLayer(overlayLayer(), SEPARATOR_LAYER);
+      map.addLayer(overlayLayer(), OUTLINE_LAYER);
     }
   }, [overlay, ready]);
 

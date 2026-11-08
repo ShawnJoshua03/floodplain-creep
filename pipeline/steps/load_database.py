@@ -8,12 +8,14 @@ from __future__ import annotations
 
 import os
 
+from pipeline.io.balance_csv import read_balance_csv
 from pipeline.io.city_config import ROOT, load_city_config
 from pipeline.io.database import (
     add_validation_result,
     apply_schema,
     connect,
     load_neighborhoods,
+    replace_balance,
     replace_exposure,
 )
 from pipeline.io.exposure_csv import read_exposure_csv
@@ -34,11 +36,12 @@ def main() -> None:
         apply_schema(conn)
         neighborhoods = load_neighborhoods(conn, PROCESSED / "neighborhoods.geojson")
         exposure = replace_exposure(conn, rows)
+        balance = replace_balance(conn, read_balance_csv(PROCESSED / "neighborhood_change_balance.csv"))
         validated = RESULT_PATH.exists()
         if validated:
             add_validation_result(conn, read_json(RESULT_PATH))
         conn.commit()
-    print(f"Loaded {neighborhoods} neighborhoods and {exposure} exposure rows")
+    print(f"Loaded {neighborhoods} neighborhoods, {exposure} exposure rows and {balance} balance rows")
     print("Added a validation result" if validated else "No validation result yet, skipped")
 
 

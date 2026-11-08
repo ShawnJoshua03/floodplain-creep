@@ -1,6 +1,6 @@
 import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { afterEach } from "vitest";
-import { citySummary } from "./testing/fixtures";
+import { focusView } from "./testing/fixtures";
 import { installFetch, renderApp } from "./testing/renderApp";
 import { defaultRouter } from "./testing/routes";
 
@@ -18,23 +18,24 @@ describe("rapid selection", () => {
     });
     installFetch(
       defaultRouter({
-        "/city/summary": (url) => {
+        "/focus": (url) => {
           const returnPeriod = Number(url.searchParams.get("return_period"));
-          if (returnPeriod === 10) {
-            return { body: citySummary(10, 111), after: slow };
+          if (returnPeriod === 50) {
+            return { body: focusView(50, { counts: [1000, 1000, 1000, 1000, 1000, 11111] }), after: slow };
           }
-          return { body: citySummary(returnPeriod, returnPeriod === 50 ? 777 : 1234) };
+          return { body: focusView(returnPeriod) };
         },
       }),
     );
     renderApp();
-    fireEvent.click(await screen.findByRole("radio", { name: "10-year" }));
+    await screen.findByRole("heading", { level: 1, name: "Badda" });
     fireEvent.click(screen.getByRole("radio", { name: "50-year" }));
-    expect(await screen.findByText("+777")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("radio", { name: "100-year" }));
+    expect(await screen.findByText("Buildings in the modeled 100-year flood zone, 2023")).toBeInTheDocument();
 
     release();
-    await waitFor(() => expect(screen.getByRole("radio", { name: "50-year" })).toBeChecked());
-    expect(screen.getByText("+777")).toBeInTheDocument();
-    expect(screen.queryByText("+111")).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("radio", { name: "100-year" })).toBeChecked());
+    expect(screen.getByText("Buildings in the modeled 100-year flood zone, 2023")).toBeInTheDocument();
+    expect(screen.queryByText("11,111")).not.toBeInTheDocument();
   });
 });

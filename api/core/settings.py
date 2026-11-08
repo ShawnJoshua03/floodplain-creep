@@ -17,6 +17,9 @@ class Settings(BaseModel):
     database_url: str
     city: str
     min_count_k: int
+    focus_neighborhood: str
+    balance_threshold_buildings: float
+    signal_noise_multiple: float
     years: list[int]
     return_periods: list[int]
     banned_terms: list[str]
@@ -48,6 +51,9 @@ def load_settings(database_url: str | None = None, config_dir: Path = CONFIG_DIR
         database_url=url,
         city=city["city"],
         min_count_k=city["min_count_k"],
+        focus_neighborhood=city["focus_neighborhood"],
+        balance_threshold_buildings=city["balance_threshold_buildings"],
+        signal_noise_multiple=city["signal_noise_multiple"],
         years=city["years"],
         return_periods=city["return_periods"],
         banned_terms=read_lines(config_dir / "banned_terms.txt"),

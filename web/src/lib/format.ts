@@ -7,7 +7,6 @@ const PERCENT_ONE_DECIMAL = new Intl.NumberFormat("en", {
   signDisplay: "exceptZero",
 });
 
-export const NOT_ENOUGH_DATA = "Not enough data";
 
 export function formatCount(value: number): string {
   return COUNT.format(value);

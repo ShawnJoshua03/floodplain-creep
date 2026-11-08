@@ -23,6 +23,9 @@ class CityConfig(BaseModel):
     min_depth_m: float
     min_coverage: float
     bbox: list[float]
+    balance_threshold_buildings: float
+    focus_neighborhood: str
+    signal_noise_multiple: float
 
     @model_validator(mode="after")
     def bbox_is_ordered(self) -> Self:

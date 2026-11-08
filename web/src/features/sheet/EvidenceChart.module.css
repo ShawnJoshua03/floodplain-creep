@@ -1,0 +1,50 @@
+.figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-4);
+  border-radius: var(--radius-group);
+  background: var(--bg-row);
+}
+
+.heading {
+  font-size: var(--text-subhead);
+  line-height: var(--line-subhead);
+}
+
+.chart {
+  width: 100%;
+  height: auto;
+}
+
+.band {
+  fill: var(--fill-control);
+}
+
+.line {
+  fill: none;
+  stroke: var(--label-secondary);
+  stroke-width: var(--icon-stroke);
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.dot {
+  fill: var(--label-secondary);
+}
+
+.selected {
+  fill: var(--accent);
+}
+
+.axis {
+  fill: var(--label-secondary);
+  font-size: var(--text-caption);
+}
+
+.caption {
+  font-size: var(--text-footnote);
+  line-height: var(--line-footnote);
+  color: var(--label-secondary);
+}

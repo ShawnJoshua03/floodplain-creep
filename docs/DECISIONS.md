@@ -137,3 +137,10 @@ None yet.
 - Brief: a missing brief is a normal answer (404 in the API), shown as "No written summary yet."
 - `CitySummary` now carries `return_periods` and `min_count_k`, so the frontend reads both from config through the API.
 - Dev server: Vite proxies the API paths to 127.0.0.1:8000. Hosting is an M8 decision.
+
+## Badda only (human decision, 2026-11-08)
+- Reason: across Dhaka, most neighborhood changes sit inside year-to-year detection noise. Badda is the one large case that stands out (smoothed change +9.9% at the 100-year scenario, about 2.1 times the typical swing; 595 flood-zone areas gained 5 or more buildings and 141 lost 5 or more). A visual check of 2018 and 2023 imagery found real land conversion, including a filled pond, but also densification the counts overstate.
+- Change: the API serves one neighborhood (`focus_neighborhood` in `config/city.yaml`) through `GET /focus`. The list endpoints are removed, and a test asserts the route list. Other neighborhoods stay in the pipeline and the database only to measure typical noise, and are never named in a response.
+- Evidence shown: the smoothed change against the typical yearly swing (`signal_noise_multiple` = 2), and flood-zone areas gaining against losing. The change balance counts 100 m areas as numbers only, with K applied in `suppression.py`.
+- Framing risk: one named neighborhood can read as a target list. Mitigation: the misuse notice and limits are one click away, the app says other neighborhoods also gained buildings, and imagery of plots stays in the pitch only, never in the app or the repo.
+- Opens on the 10-year scenario, where the signal is strongest (+31.8%, 6.4 times the swing). At 500 years the verdict is within noise (1.8 times). The verdict is shown for every scenario.

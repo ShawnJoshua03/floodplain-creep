@@ -1,13 +1,16 @@
+from typing import Any
+
 import psycopg
 from fastapi.testclient import TestClient
 
-from tests.api_support import VALIDATION_PAYLOAD
+from tests.api_support import FOCUS_COUNTS, VALIDATION_PAYLOAD
 
 
-def features_by_id(client: TestClient, **params: int) -> dict[str, dict[str, object]]:
-    response = client.get("/neighborhoods", params=params)
+def focus(client: TestClient, return_period: int = 100) -> dict[str, Any]:
+    response = client.get("/focus", params={"return_period": return_period})
     assert response.status_code == 200
-    return {f["properties"]["neighborhood_id"]: f["properties"] for f in response.json()["features"]}
+    body: dict[str, Any] = response.json()
+    return body
 
 
 def store_brief(conn: psycopg.Connection, text: str) -> None:
@@ -18,42 +21,62 @@ def store_brief(conn: psycopg.Connection, text: str) -> None:
     conn.commit()
 
 
-def test_normal_neighborhood_returns_counts(client: TestClient) -> None:
-    shown = features_by_id(client, return_period=100, year=2023)["n1"]
-    assert shown["buildings_in_zone"] == 120
-    assert shown["new_buildings_in_zone"] == 40
-    assert shown["growth_pct"] == 50.0
-    assert shown["suppressed"] is False
-    assert shown["change_available"] is True
-
-
-def test_suppressed_neighborhood_returns_null_counts(client: TestClient) -> None:
-    hidden = features_by_id(client, return_period=100, year=2023)["n2"]
-    assert hidden["suppressed"] is True
-    assert hidden["buildings_in_zone"] is None
-    assert hidden["new_buildings_in_zone"] is None
-    assert hidden["growth_pct"] is None
-
-
-def test_city_summary_counts_shown_and_suppressed(client: TestClient) -> None:
-    body = client.get("/city/summary", params={"return_period": 100}).json()
+def test_focus_returns_the_focus_neighborhood_and_its_yearly_counts(client: TestClient) -> None:
+    body = focus(client)
     assert body["city"] == "Dhaka"
     assert body["return_periods"] == [10, 50, 100, 500]
     assert body["min_count_k"] == 20
-    by_year = {row["year"]: row for row in body["years"]}
-    assert by_year[2023]["buildings_in_zone"] == 120
-    assert by_year[2023]["new_buildings_in_zone"] == 40
-    assert by_year[2023]["neighborhoods_shown"] == 1
-    assert by_year[2023]["neighborhoods_suppressed"] == 1
+    assert body["neighborhood"]["name"] == "One"
+    series = body["series"]
+    assert [row["buildings_in_zone"] for row in series] == FOCUS_COUNTS
+    assert series[-1]["new_buildings_in_zone"] == 30
+    assert series[-1]["growth_pct"] == 30.0
+
+
+def test_signal_compares_the_change_with_the_noise_of_the_other_neighborhoods(client: TestClient) -> None:
+    body = focus(client)
+    assert body["noise"]["neighborhoods_used"] == 1
+    assert body["signal"]["verdict"] == "clear_growth"
+    assert body["signal"]["required_multiple"] == 2
+    assert body["signal"]["times_typical_swing"] > 2
+
+
+def test_balance_compares_the_focus_with_the_rest_of_the_city(client: TestClient) -> None:
+    balance = focus(client)["balance"]
+    assert balance["focus"] == {"cells_gaining": 30, "cells_losing": 5}
+    assert balance["rest_of_city"] == {"cells_gaining": 11, "cells_losing": 11}
+    assert balance["threshold_buildings"] == 5
+
+
+def test_a_scenario_with_no_data_has_no_noise_and_not_enough_data(client: TestClient) -> None:
+    body = focus(client, 10)
+    assert body["noise"] is None
+    assert body["signal"]["verdict"] == "not_enough_data"
+    assert body["balance"] is None
+
+
+def test_a_suppressed_focus_shows_null_counts_and_no_verdict(client: TestClient, conn: psycopg.Connection) -> None:
+    conn.execute(
+        "UPDATE neighborhood_year_exposure SET suppressed = true, buildings_in_zone = NULL,"
+        " new_buildings_in_zone = NULL, growth_pct = NULL, change_available = false WHERE neighborhood_id = 'n1'"
+    )
+    conn.commit()
+    body = focus(client)
+    assert all(row["buildings_in_zone"] is None for row in body["series"])
+    assert body["signal"]["verdict"] == "not_enough_data"
 
 
 def test_unsupported_return_period_is_rejected(client: TestClient) -> None:
-    assert client.get("/neighborhoods", params={"return_period": 25, "year": 2023}).status_code == 422
-    assert client.get("/city/summary", params={"return_period": 25}).status_code == 422
+    assert client.get("/focus", params={"return_period": 25}).status_code == 422
+    assert client.get("/focus", params={"return_period": "abc"}).status_code == 422
 
 
-def test_year_outside_the_data_years_is_rejected(client: TestClient) -> None:
-    assert client.get("/neighborhoods", params={"return_period": 100, "year": 2017}).status_code == 422
+def test_a_missing_focus_neighborhood_is_not_found(client: TestClient, conn: psycopg.Connection) -> None:
+    conn.execute("DELETE FROM neighborhood_change_balance")
+    conn.execute("DELETE FROM neighborhood_year_exposure")
+    conn.execute("DELETE FROM neighborhoods WHERE name = 'One'")
+    conn.commit()
+    assert client.get("/focus").status_code == 404
 
 
 def test_validation_returns_the_stored_result(client: TestClient) -> None:
@@ -69,15 +92,14 @@ def test_validation_is_not_found_when_nothing_is_stored(client: TestClient, conn
 
 
 def test_brief_is_served_from_storage(client: TestClient, conn: psycopg.Connection) -> None:
-    store_brief(conn, "New buildings in the modeled flood zone grew by 40.")
-    body = client.get("/brief/n1", params={"return_period": 100}).json()
+    store_brief(conn, "New buildings in the modeled flood zone grew by 30.")
+    body = client.get("/brief", params={"return_period": 100}).json()
     assert body["source"] == "template"
-    assert "40" in body["text"]
+    assert "30" in body["text"]
 
 
-def test_missing_brief_and_unknown_neighborhood_are_not_found(client: TestClient) -> None:
-    assert client.get("/brief/n1", params={"return_period": 100}).status_code == 404
-    assert client.get("/brief/nope", params={"return_period": 100}).status_code == 404
+def test_missing_brief_is_not_found(client: TestClient) -> None:
+    assert client.get("/brief", params={"return_period": 100}).status_code == 404
 
 
 def test_overlay_info_and_image(client: TestClient) -> None:

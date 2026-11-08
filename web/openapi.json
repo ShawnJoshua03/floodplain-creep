@@ -5,10 +5,10 @@
     "version": "0.1.0"
   },
   "paths": {
-    "/city/summary": {
+    "/focus": {
       "get": {
-        "summary": "Get City Summary",
-        "operationId": "get_city_summary_city_summary_get",
+        "summary": "Get Focus",
+        "operationId": "get_focus_focus_get",
         "parameters": [
           {
             "name": "return_period",
@@ -27,57 +27,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CitySummary"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/neighborhoods": {
-      "get": {
-        "summary": "Get Neighborhoods",
-        "operationId": "get_neighborhoods_neighborhoods_get",
-        "parameters": [
-          {
-            "name": "return_period",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 100,
-              "title": "Return Period"
-            }
-          },
-          {
-            "name": "year",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 2023,
-              "title": "Year"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NeighborhoodCollection"
+                  "$ref": "#/components/schemas/FocusView"
                 }
               }
             }
@@ -185,20 +135,11 @@
         }
       }
     },
-    "/brief/{neighborhood_id}": {
+    "/brief": {
       "get": {
         "summary": "Get Brief",
-        "operationId": "get_brief_brief__neighborhood_id__get",
+        "operationId": "get_brief_brief_get",
         "parameters": [
-          {
-            "name": "neighborhood_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Neighborhood Id"
-            }
-          },
           {
             "name": "return_period",
             "in": "query",
@@ -255,6 +196,28 @@
   },
   "components": {
     "schemas": {
+      "Balance": {
+        "properties": {
+          "threshold_buildings": {
+            "type": "number",
+            "title": "Threshold Buildings"
+          },
+          "focus": {
+            "$ref": "#/components/schemas/CellCounts"
+          },
+          "rest_of_city": {
+            "$ref": "#/components/schemas/CellCounts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "threshold_buildings",
+          "focus",
+          "rest_of_city"
+        ],
+        "title": "Balance",
+        "description": "Flood-zone areas of 100 m that gained buildings against areas that lost them, first year to last."
+      },
       "Brief": {
         "properties": {
           "neighborhood_id": {
@@ -287,95 +250,23 @@
         ],
         "title": "Brief"
       },
-      "CitySummary": {
+      "CellCounts": {
         "properties": {
-          "city": {
-            "type": "string",
-            "title": "City"
-          },
-          "return_period": {
+          "cells_gaining": {
             "type": "integer",
-            "title": "Return Period"
+            "title": "Cells Gaining"
           },
-          "first_year": {
+          "cells_losing": {
             "type": "integer",
-            "title": "First Year"
-          },
-          "last_year": {
-            "type": "integer",
-            "title": "Last Year"
-          },
-          "return_periods": {
-            "items": {
-              "type": "integer"
-            },
-            "type": "array",
-            "title": "Return Periods"
-          },
-          "min_count_k": {
-            "type": "integer",
-            "title": "Min Count K"
-          },
-          "years": {
-            "items": {
-              "$ref": "#/components/schemas/CityYear"
-            },
-            "type": "array",
-            "title": "Years"
+            "title": "Cells Losing"
           }
         },
         "type": "object",
         "required": [
-          "city",
-          "return_period",
-          "first_year",
-          "last_year",
-          "return_periods",
-          "min_count_k",
-          "years"
+          "cells_gaining",
+          "cells_losing"
         ],
-        "title": "CitySummary"
-      },
-      "CityYear": {
-        "properties": {
-          "year": {
-            "type": "integer",
-            "title": "Year"
-          },
-          "buildings_in_zone": {
-            "type": "integer",
-            "title": "Buildings In Zone"
-          },
-          "new_buildings_in_zone": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "New Buildings In Zone"
-          },
-          "neighborhoods_shown": {
-            "type": "integer",
-            "title": "Neighborhoods Shown"
-          },
-          "neighborhoods_suppressed": {
-            "type": "integer",
-            "title": "Neighborhoods Suppressed"
-          }
-        },
-        "type": "object",
-        "required": [
-          "year",
-          "buildings_in_zone",
-          "new_buildings_in_zone",
-          "neighborhoods_shown",
-          "neighborhoods_suppressed"
-        ],
-        "title": "CityYear",
-        "description": "Totals over the neighborhoods that are shown. Suppressed neighborhoods are counted, not summed."
+        "title": "CellCounts"
       },
       "Confusion": {
         "properties": {
@@ -434,6 +325,85 @@
           "color"
         ],
         "title": "DepthBin"
+      },
+      "FocusView": {
+        "properties": {
+          "city": {
+            "type": "string",
+            "title": "City"
+          },
+          "return_period": {
+            "type": "integer",
+            "title": "Return Period"
+          },
+          "return_periods": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Return Periods"
+          },
+          "first_year": {
+            "type": "integer",
+            "title": "First Year"
+          },
+          "last_year": {
+            "type": "integer",
+            "title": "Last Year"
+          },
+          "min_count_k": {
+            "type": "integer",
+            "title": "Min Count K"
+          },
+          "neighborhood": {
+            "$ref": "#/components/schemas/Outline"
+          },
+          "series": {
+            "items": {
+              "$ref": "#/components/schemas/SeriesYear"
+            },
+            "type": "array",
+            "title": "Series"
+          },
+          "noise": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Noise"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "signal": {
+            "$ref": "#/components/schemas/Signal"
+          },
+          "balance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Balance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "city",
+          "return_period",
+          "return_periods",
+          "first_year",
+          "last_year",
+          "min_count_k",
+          "neighborhood",
+          "series",
+          "noise",
+          "signal",
+          "balance"
+        ],
+        "title": "FocusView"
       },
       "HTTPValidationError": {
         "properties": {
@@ -580,48 +550,38 @@
         ],
         "title": "MultiPolygonGeometry"
       },
-      "NeighborhoodCollection": {
+      "Noise": {
         "properties": {
-          "type": {
-            "type": "string",
-            "const": "FeatureCollection",
-            "title": "Type",
-            "default": "FeatureCollection"
+          "typical_swing_pct": {
+            "type": "number",
+            "title": "Typical Swing Pct"
           },
-          "year": {
+          "neighborhoods_used": {
             "type": "integer",
-            "title": "Year"
-          },
-          "return_period": {
-            "type": "integer",
-            "title": "Return Period"
-          },
-          "features": {
-            "items": {
-              "$ref": "#/components/schemas/NeighborhoodFeature"
-            },
-            "type": "array",
-            "title": "Features"
+            "title": "Neighborhoods Used"
           }
         },
         "type": "object",
         "required": [
-          "year",
-          "return_period",
-          "features"
+          "typical_swing_pct",
+          "neighborhoods_used"
         ],
-        "title": "NeighborhoodCollection"
+        "title": "Noise",
+        "description": "How much counts move from one year to the next in the other neighborhoods. No neighborhood is named."
       },
-      "NeighborhoodFeature": {
+      "Outline": {
         "properties": {
-          "type": {
+          "neighborhood_id": {
             "type": "string",
-            "const": "Feature",
-            "title": "Type",
-            "default": "Feature"
+            "title": "Neighborhood Id"
           },
-          "properties": {
-            "$ref": "#/components/schemas/NeighborhoodProperties"
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "boundary_source": {
+            "type": "string",
+            "title": "Boundary Source"
           },
           "geometry": {
             "anyOf": [
@@ -637,89 +597,12 @@
         },
         "type": "object",
         "required": [
-          "properties",
-          "geometry"
-        ],
-        "title": "NeighborhoodFeature"
-      },
-      "NeighborhoodProperties": {
-        "properties": {
-          "buildings_in_zone": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Buildings In Zone"
-          },
-          "new_buildings_in_zone": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "New Buildings In Zone"
-          },
-          "growth_pct": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Growth Pct"
-          },
-          "suppressed": {
-            "type": "boolean",
-            "title": "Suppressed"
-          },
-          "change_available": {
-            "type": "boolean",
-            "title": "Change Available"
-          },
-          "neighborhood_id": {
-            "type": "string",
-            "title": "Neighborhood Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "year": {
-            "type": "integer",
-            "title": "Year"
-          },
-          "return_period": {
-            "type": "integer",
-            "title": "Return Period"
-          },
-          "boundary_source": {
-            "type": "string",
-            "title": "Boundary Source"
-          }
-        },
-        "type": "object",
-        "required": [
-          "buildings_in_zone",
-          "new_buildings_in_zone",
-          "growth_pct",
-          "suppressed",
-          "change_available",
           "neighborhood_id",
           "name",
-          "year",
-          "return_period",
-          "boundary_source"
+          "boundary_source",
+          "geometry"
         ],
-        "title": "NeighborhoodProperties"
+        "title": "Outline"
       },
       "OverlayInfo": {
         "properties": {
@@ -787,6 +670,115 @@
           "coordinates"
         ],
         "title": "PolygonGeometry"
+      },
+      "SeriesYear": {
+        "properties": {
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "buildings_in_zone": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Buildings In Zone"
+          },
+          "new_buildings_in_zone": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Buildings In Zone"
+          },
+          "growth_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Growth Pct"
+          },
+          "suppressed": {
+            "type": "boolean",
+            "title": "Suppressed"
+          },
+          "change_available": {
+            "type": "boolean",
+            "title": "Change Available"
+          }
+        },
+        "type": "object",
+        "required": [
+          "year",
+          "buildings_in_zone",
+          "new_buildings_in_zone",
+          "growth_pct",
+          "suppressed",
+          "change_available"
+        ],
+        "title": "SeriesYear",
+        "description": "Counts for the focus neighborhood in one year. A suppressed year holds null counts."
+      },
+      "Signal": {
+        "properties": {
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "clear_growth",
+              "clear_decline",
+              "within_noise",
+              "not_enough_data"
+            ],
+            "title": "Verdict"
+          },
+          "smoothed_change_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Smoothed Change Pct"
+          },
+          "times_typical_swing": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Times Typical Swing"
+          },
+          "required_multiple": {
+            "type": "number",
+            "title": "Required Multiple"
+          }
+        },
+        "type": "object",
+        "required": [
+          "verdict",
+          "smoothed_change_pct",
+          "times_typical_swing",
+          "required_multiple"
+        ],
+        "title": "Signal",
+        "description": "Whether the change from the first years to the last years stands out from the typical swing."
       },
       "ValidationError": {
         "properties": {

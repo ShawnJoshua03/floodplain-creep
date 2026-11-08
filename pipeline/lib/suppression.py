@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from pipeline.lib.aggregation import ZoneTotal
+from pipeline.lib.balance import RawBalance
 
 
 @dataclass(frozen=True)
@@ -57,3 +58,35 @@ def check_rows(rows: list[ExposureRow], k: int) -> None:
             raise ValueError(f"Shown row is below K={k}: {where}")
         if not row.change_available and (row.new_buildings_in_zone is not None or row.growth_pct is not None):
             raise ValueError(f"Change shown without a usable baseline: {where}")
+
+
+@dataclass(frozen=True)
+class BalanceRow:
+    """Cell counts for one neighborhood, or for the whole study area when neighborhood_id is None."""
+
+    neighborhood_id: str | None
+    return_period: int
+    cells_in_zone: int | None
+    cells_gaining: int | None
+    cells_losing: int | None
+    suppressed: bool
+
+
+def suppress_balance(raw: list[RawBalance], k: int) -> list[BalanceRow]:
+    """A neighborhood with fewer than K flood-zone cells shows no cell counts. The whole study area always shows."""
+    rows: list[BalanceRow] = []
+    for item in raw:
+        if item.neighborhood_id is not None and item.cells_in_zone < k:
+            rows.append(BalanceRow(item.neighborhood_id, item.return_period, None, None, None, True))
+        else:
+            rows.append(
+                BalanceRow(
+                    item.neighborhood_id,
+                    item.return_period,
+                    item.cells_in_zone,
+                    item.cells_gaining,
+                    item.cells_losing,
+                    False,
+                )
+            )
+    return rows

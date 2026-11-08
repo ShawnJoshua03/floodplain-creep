@@ -1,72 +1,46 @@
 import { useMemo, useState } from "react";
-import { useCitySummary, useNeighborhoods, useOverlay } from "../../api/hooks";
+import { useFocus, useOverlay } from "../../api/hooks";
 import { Scrubber } from "../../components/Scrubber/Scrubber";
-import { bucketOf, computeBreaks } from "../../lib/exposureBreaks";
+import { bucketInRange } from "../../lib/bucket";
 import { formatCount } from "../../lib/format";
 import { useSelection } from "../../state/SelectionProvider";
-import { type MapGeometry, MapView } from "../map/MapView";
+import { MapView } from "../map/MapView";
 import { LimitsDialog } from "../sheet/LimitsDialog";
 import { SheetPanel } from "../sheet/SheetPanel";
 import { InfoButton } from "./InfoButton";
-import { MapLabel } from "./MapLabel";
 import { usePlayback } from "./usePlayback";
 
-const MAP_LABEL =
-  "Map of neighborhoods shaded by buildings in the modeled flood zone. The list in the panel has the same numbers.";
+const MAP_LABEL = "Map of the neighborhood outline with modeled flood depth. The panel has the numbers.";
 
 export function AppShell() {
-  const { year, returnPeriod, neighborhoodId, overlayOn, setYear, selectNeighborhood } = useSelection();
-  const summary = useCitySummary(returnPeriod);
-  const lastYear = summary.data?.last_year ?? year;
-  const firstYear = summary.data?.first_year ?? year;
-  const current = useNeighborhoods(returnPeriod, year);
-  const reference = useNeighborhoods(returnPeriod, lastYear);
+  const { year, returnPeriod, overlayOn, focusName, setYear } = useSelection();
+  const focus = useFocus(returnPeriod);
   const overlay = useOverlay(returnPeriod, overlayOn);
-  const [hoverId, setHoverId] = useState<string | null>(null);
   const [limitsOpen, setLimitsOpen] = useState(false);
+  const firstYear = focus.data?.first_year ?? year;
+  const lastYear = focus.data?.last_year ?? year;
   const playback = usePlayback(year, lastYear, setYear);
 
-  const geometries = useMemo<MapGeometry[]>(
-    () =>
-      (reference.data?.features ?? []).map((feature) => ({
-        id: feature.properties.neighborhood_id,
-        geometry: feature.geometry,
-      })),
-    [reference.data],
-  );
-  const buckets = useMemo(() => {
-    const shown = (reference.data?.features ?? []).flatMap((feature) => feature.properties.buildings_in_zone ?? []);
-    const breaks = computeBreaks(shown);
-    return Object.fromEntries(
-      (current.data?.features ?? []).map((feature) => [
-        feature.properties.neighborhood_id,
-        bucketOf(feature.properties.buildings_in_zone, breaks),
-      ]),
-    );
-  }, [reference.data, current.data]);
-
+  const counts = useMemo(() => (focus.data?.series ?? []).map((row) => row.buildings_in_zone), [focus.data]);
+  const current = focus.data?.series.find((row) => row.year === year)?.buildings_in_zone ?? null;
+  const bucket = focus.data ? bucketInRange(current, counts) : 0;
   const overlayImage = useMemo(
     () => (overlayOn && overlay.data ? { url: overlay.data.image_url, bounds: overlay.data.bounds } : null),
     [overlayOn, overlay.data],
   );
-  const names = new Map((current.data?.features ?? []).map((f) => [f.properties.neighborhood_id, f.properties.name]));
-  const totals = summary.data?.years.find((item) => item.year === year);
-  const announcement = totals
-    ? `${year}, ${returnPeriod}-year flood, ${formatCount(totals.buildings_in_zone)} buildings in the modeled flood zone`
-    : "";
+  const announcement =
+    current === null
+      ? ""
+      : `${focusName}, ${year}, ${returnPeriod}-year flood, ${formatCount(current)} buildings in the modeled flood zone`;
 
   return (
     <>
       <MapView
         label={MAP_LABEL}
-        geometries={geometries}
-        buckets={buckets}
-        selectedId={neighborhoodId}
+        geometry={focus.data?.neighborhood.geometry ?? null}
+        bucket={bucket}
         overlay={overlayImage}
-        onSelect={selectNeighborhood}
-        onHover={setHoverId}
       />
-      <MapLabel name={names.get(hoverId ?? neighborhoodId ?? "")} />
       <InfoButton onPress={() => setLimitsOpen(true)} />
       <SheetPanel onOpenLimits={() => setLimitsOpen(true)} />
       <Scrubber

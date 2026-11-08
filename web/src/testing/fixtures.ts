@@ -1,70 +1,45 @@
-import type {
-  Brief,
-  CitySummary,
-  Limits,
-  NeighborhoodCollection,
-  OverlayInfo,
-  ValidationResult,
-} from "../api/types";
+import type { FocusView, Limits, OverlayInfo, ValidationResult } from "../api/types";
 
 const POLYGON = { type: "Polygon" as const, coordinates: [[[0, 0], [1, 0], [1, 1], [0, 0]]] };
 
-interface Seed {
-  id: string;
-  name: string;
-  count: number | null;
+const FOCUS_COUNTS = [33502, 33774, 35779, 35667, 34975, 38936];
+
+interface FocusOptions {
+  counts?: (number | null)[];
+  verdict?: FocusView["signal"]["verdict"];
+  withNoise?: boolean;
 }
 
-const SEEDS: Seed[] = [
-  { id: "n1", name: "Adabor", count: 6802 },
-  { id: "n2", name: "Badda", count: 5400 },
-  { id: "n3", name: "Dhanmondi", count: null },
-  { id: "n4", name: "Gulshan", count: 4100 },
-  { id: "n5", name: "Hazaribagh", count: 3900 },
-  { id: "n6", name: "Khilgaon", count: 3300 },
-  { id: "n7", name: "Lalbagh", count: 2500 },
-  { id: "n8", name: "Mirpur", count: 1900 },
-];
-
-export function neighborhoods(year: number, returnPeriod: number, seeds: Seed[] = SEEDS): NeighborhoodCollection {
-  return {
-    type: "FeatureCollection",
-    year,
-    return_period: returnPeriod,
-    features: seeds.map(({ id, name, count }) => ({
-      type: "Feature",
-      geometry: POLYGON,
-      properties: {
-        neighborhood_id: id,
-        name,
-        year,
-        return_period: returnPeriod,
-        boundary_source: "test",
-        buildings_in_zone: count,
-        new_buildings_in_zone: count === null ? null : -496,
-        growth_pct: count === null ? null : -6.8,
-        suppressed: count === null,
-        change_available: count !== null,
-      },
-    })),
-  };
-}
-
-export function citySummary(returnPeriod: number, newBuildings: number): CitySummary {
+/** A focus answer for one scenario. Suppressed years hold null counts, as in the real API. */
+export function focusView(returnPeriod: number, options: FocusOptions = {}): FocusView {
+  const { counts = FOCUS_COUNTS, verdict = "clear_growth", withNoise = true } = options;
+  const first = counts[0] ?? null;
   return {
     city: "Dhaka",
     return_period: returnPeriod,
+    return_periods: [10, 50, 100, 500],
     first_year: 2018,
     last_year: 2023,
-    return_periods: [10, 50, 100, 500],
     min_count_k: 20,
-    years: [2018, 2019, 2020, 2021, 2022, 2023].map((year) => ({
-      year,
-      buildings_in_zone: 100000,
-      new_buildings_in_zone: newBuildings,
-      neighborhoods_shown: 24,
-      neighborhoods_suppressed: 9,
+    neighborhood: { neighborhood_id: "n1", name: "Badda", boundary_source: "test", geometry: POLYGON },
+    series: counts.map((count, index) => ({
+      year: 2018 + index,
+      buildings_in_zone: count,
+      new_buildings_in_zone: count === null || first === null ? null : count - first,
+      growth_pct: count === null || first === null ? null : Math.round(((count - first) / first) * 1000) / 10,
+      suppressed: count === null,
+      change_available: count !== null && first !== null,
     })),
+    noise: withNoise ? { typical_swing_pct: 4.7, neighborhoods_used: 23 } : null,
+    signal:
+      verdict === "not_enough_data"
+        ? { verdict, smoothed_change_pct: null, times_typical_swing: null, required_multiple: 2 }
+        : { verdict, smoothed_change_pct: 9.9, times_typical_swing: verdict === "within_noise" ? 1.5 : 2.1, required_multiple: 2 },
+    balance: {
+      threshold_buildings: 5,
+      focus: { cells_gaining: 595, cells_losing: 141 },
+      rest_of_city: { cells_gaining: 1188, cells_losing: 854 },
+    },
   };
 }
 
@@ -103,11 +78,4 @@ export const LIMITS: Limits = {
   limits: ["Data covers 2018 to 2023.", "This is not an official warning."],
   misuse_notice: "This tool is for preparedness and public accountability.",
   banned_terms: ["example term"],
-};
-
-export const BRIEF: Brief = {
-  neighborhood_id: "n1",
-  return_period: 100,
-  text: "Buildings in the modeled flood zone fell by 496 since 2018.",
-  source: "template",
 };

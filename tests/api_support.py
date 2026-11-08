@@ -1,4 +1,7 @@
-"""Shared setup for API tests: a seeded schema, settings, and overlay files."""
+"""Shared setup for API tests: a seeded schema, settings, and overlay files.
+
+Neighborhood n1 is the focus and grows. n2 stays too small to show. n3 is a steady neighborhood that sets the noise.
+"""
 
 from __future__ import annotations
 
@@ -9,10 +12,15 @@ import psycopg
 from psycopg.conninfo import make_conninfo
 
 from api.core.settings import Settings, load_settings
-from pipeline.io.database import add_validation_result, load_neighborhoods, replace_exposure
+from pipeline.io.database import add_validation_result, load_neighborhoods, replace_balance, replace_exposure
 from pipeline.lib.aggregation import ZoneTotal
-from pipeline.lib.suppression import apply_suppression
-from tests.test_database import write_geojson
+from pipeline.lib.balance import RawBalance
+from pipeline.lib.suppression import apply_suppression, suppress_balance
+
+YEARS = [2018, 2019, 2020, 2021, 2022, 2023]
+FOCUS_COUNTS = [100, 102, 110, 108, 115, 130]
+STEADY_COUNTS = [200, 204, 198, 202, 206, 200]
+SMALL_COUNTS = [4, 5, 4, 6, 5, 6]
 
 VALIDATION_PAYLOAD: dict[str, object] = {
     "labeled_cells": 140,
@@ -34,17 +42,35 @@ VALIDATION_PAYLOAD: dict[str, object] = {
 }
 
 
-def seed_database(conn: psycopg.Connection, tmp_path: Path, k: int) -> None:
-    """Neighborhood n1 stays above K in both years. Neighborhood n2 stays below K."""
-    totals = [
-        ZoneTotal("n1", 2018, 100, 80.0),
-        ZoneTotal("n1", 2023, 100, 120.0),
-        ZoneTotal("n2", 2018, 100, 4.0),
-        ZoneTotal("n2", 2023, 100, 6.0),
+def write_neighborhoods(path: Path) -> None:
+    ring = [[[0, 0], [1, 0], [1, 1], [0, 0]]]
+    features = [
+        {
+            "type": "Feature",
+            "properties": {"neighborhood_id": key, "name": name, "coverage": 0.9, "boundary_source": "test"},
+            "geometry": {"type": "Polygon", "coordinates": ring},
+        }
+        for key, name in [("n1", "One"), ("n2", "Two"), ("n3", "Three")]
     ]
-    write_geojson(tmp_path / "n.geojson")
+    path.write_text(json.dumps({"type": "FeatureCollection", "features": features}), encoding="utf-8")
+
+
+def totals(key: str, counts: list[int]) -> list[ZoneTotal]:
+    return [ZoneTotal(key, year, 100, float(count)) for year, count in zip(YEARS, counts, strict=True)]
+
+
+def seed_database(conn: psycopg.Connection, tmp_path: Path, k: int) -> None:
+    write_neighborhoods(tmp_path / "n.geojson")
     load_neighborhoods(conn, tmp_path / "n.geojson")
-    replace_exposure(conn, apply_suppression(totals, k, 2018))
+    all_totals = totals("n1", FOCUS_COUNTS) + totals("n2", SMALL_COUNTS) + totals("n3", STEADY_COUNTS)
+    replace_exposure(conn, apply_suppression(all_totals, k, YEARS[0]))
+    balance = [
+        RawBalance("n1", 100, 50, 30, 5),
+        RawBalance("n2", 100, 4, 1, 1),
+        RawBalance("n3", 100, 60, 10, 10),
+        RawBalance(None, 100, 114, 41, 16),
+    ]
+    replace_balance(conn, suppress_balance(balance, k))
     add_validation_result(conn, VALIDATION_PAYLOAD)
     conn.commit()
 
@@ -54,7 +80,7 @@ def write_overlay_files(overlay_dir: Path) -> None:
     (overlay_dir / "depth_rp100.png").write_bytes(b"\x89PNG\r\n\x1a\n")
     manifest = {
         "bounds": [90.34, 23.69, 90.47, 23.82],
-        "bins": [{"min_depth_m": 0.1, "max_depth_m": 0.5, "color": "#9ecae1"}],
+        "bins": [{"min_depth_m": 0.1, "max_depth_m": 0.5, "color": "#1e4f86"}],
         "images": {"100": "depth_rp100.png"},
     }
     (overlay_dir / "overlays.json").write_text(json.dumps(manifest), encoding="utf-8")
@@ -62,4 +88,4 @@ def write_overlay_files(overlay_dir: Path) -> None:
 
 def api_settings(database_url: str, schema_name: str, overlay_dir: Path) -> Settings:
     scoped_url = make_conninfo(database_url, options=f"-c search_path={schema_name}")
-    return load_settings(scoped_url).model_copy(update={"overlay_dir": overlay_dir})
+    return load_settings(scoped_url).model_copy(update={"overlay_dir": overlay_dir, "focus_neighborhood": "One"})

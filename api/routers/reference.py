@@ -36,9 +36,9 @@ def get_validation(conn: Connection) -> ValidationResult:
     return validation.latest_validation(conn)
 
 
-@router.get("/brief/{neighborhood_id}", response_model=Brief)
-def get_brief(neighborhood_id: str, conn: Connection, settings: AppSettings, return_period: int = 100) -> Brief:
-    return briefs.stored_brief(conn, settings, neighborhood_id, return_period)
+@router.get("/brief", response_model=Brief)
+def get_brief(conn: Connection, settings: AppSettings, return_period: int = 100) -> Brief:
+    return briefs.stored_brief(conn, settings, return_period)
 
 
 @router.get("/limits", response_model=Limits)

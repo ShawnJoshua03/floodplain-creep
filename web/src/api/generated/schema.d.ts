@@ -4,32 +4,15 @@
  */
 
 export interface paths {
-    "/city/summary": {
+    "/focus": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Get City Summary */
-        get: operations["get_city_summary_city_summary_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/neighborhoods": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Neighborhoods */
-        get: operations["get_neighborhoods_neighborhoods_get"];
+        /** Get Focus */
+        get: operations["get_focus_focus_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -89,7 +72,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/brief/{neighborhood_id}": {
+    "/brief": {
         parameters: {
             query?: never;
             header?: never;
@@ -97,7 +80,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get Brief */
-        get: operations["get_brief_brief__neighborhood_id__get"];
+        get: operations["get_brief_brief_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -127,6 +110,16 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * Balance
+         * @description Flood-zone areas of 100 m that gained buildings against areas that lost them, first year to last.
+         */
+        Balance: {
+            /** Threshold Buildings */
+            threshold_buildings: number;
+            focus: components["schemas"]["CellCounts"];
+            rest_of_city: components["schemas"]["CellCounts"];
+        };
         /** Brief */
         Brief: {
             /** Neighborhood Id */
@@ -141,38 +134,12 @@ export interface components {
              */
             source: "gemini" | "template";
         };
-        /** CitySummary */
-        CitySummary: {
-            /** City */
-            city: string;
-            /** Return Period */
-            return_period: number;
-            /** First Year */
-            first_year: number;
-            /** Last Year */
-            last_year: number;
-            /** Return Periods */
-            return_periods: number[];
-            /** Min Count K */
-            min_count_k: number;
-            /** Years */
-            years: components["schemas"]["CityYear"][];
-        };
-        /**
-         * CityYear
-         * @description Totals over the neighborhoods that are shown. Suppressed neighborhoods are counted, not summed.
-         */
-        CityYear: {
-            /** Year */
-            year: number;
-            /** Buildings In Zone */
-            buildings_in_zone: number;
-            /** New Buildings In Zone */
-            new_buildings_in_zone: number | null;
-            /** Neighborhoods Shown */
-            neighborhoods_shown: number;
-            /** Neighborhoods Suppressed */
-            neighborhoods_suppressed: number;
+        /** CellCounts */
+        CellCounts: {
+            /** Cells Gaining */
+            cells_gaining: number;
+            /** Cells Losing */
+            cells_losing: number;
         };
         /** Confusion */
         Confusion: {
@@ -193,6 +160,27 @@ export interface components {
             max_depth_m: number | null;
             /** Color */
             color: string;
+        };
+        /** FocusView */
+        FocusView: {
+            /** City */
+            city: string;
+            /** Return Period */
+            return_period: number;
+            /** Return Periods */
+            return_periods: number[];
+            /** First Year */
+            first_year: number;
+            /** Last Year */
+            last_year: number;
+            /** Min Count K */
+            min_count_k: number;
+            neighborhood: components["schemas"]["Outline"];
+            /** Series */
+            series: components["schemas"]["SeriesYear"][];
+            noise: components["schemas"]["Noise"] | null;
+            signal: components["schemas"]["Signal"];
+            balance: components["schemas"]["Balance"] | null;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -238,55 +226,26 @@ export interface components {
             /** Coordinates */
             coordinates: number[][][][];
         };
-        /** NeighborhoodCollection */
-        NeighborhoodCollection: {
-            /**
-             * Type
-             * @default FeatureCollection
-             * @constant
-             */
-            type: "FeatureCollection";
-            /** Year */
-            year: number;
-            /** Return Period */
-            return_period: number;
-            /** Features */
-            features: components["schemas"]["NeighborhoodFeature"][];
+        /**
+         * Noise
+         * @description How much counts move from one year to the next in the other neighborhoods. No neighborhood is named.
+         */
+        Noise: {
+            /** Typical Swing Pct */
+            typical_swing_pct: number;
+            /** Neighborhoods Used */
+            neighborhoods_used: number;
         };
-        /** NeighborhoodFeature */
-        NeighborhoodFeature: {
-            /**
-             * Type
-             * @default Feature
-             * @constant
-             */
-            type: "Feature";
-            properties: components["schemas"]["NeighborhoodProperties"];
-            /** Geometry */
-            geometry: components["schemas"]["PolygonGeometry"] | components["schemas"]["MultiPolygonGeometry"];
-        };
-        /** NeighborhoodProperties */
-        NeighborhoodProperties: {
-            /** Buildings In Zone */
-            buildings_in_zone: number | null;
-            /** New Buildings In Zone */
-            new_buildings_in_zone: number | null;
-            /** Growth Pct */
-            growth_pct: number | null;
-            /** Suppressed */
-            suppressed: boolean;
-            /** Change Available */
-            change_available: boolean;
+        /** Outline */
+        Outline: {
             /** Neighborhood Id */
             neighborhood_id: string;
             /** Name */
             name: string;
-            /** Year */
-            year: number;
-            /** Return Period */
-            return_period: number;
             /** Boundary Source */
             boundary_source: string;
+            /** Geometry */
+            geometry: components["schemas"]["PolygonGeometry"] | components["schemas"]["MultiPolygonGeometry"];
         };
         /** OverlayInfo */
         OverlayInfo: {
@@ -310,6 +269,41 @@ export interface components {
             type: "Polygon";
             /** Coordinates */
             coordinates: number[][][];
+        };
+        /**
+         * SeriesYear
+         * @description Counts for the focus neighborhood in one year. A suppressed year holds null counts.
+         */
+        SeriesYear: {
+            /** Year */
+            year: number;
+            /** Buildings In Zone */
+            buildings_in_zone: number | null;
+            /** New Buildings In Zone */
+            new_buildings_in_zone: number | null;
+            /** Growth Pct */
+            growth_pct: number | null;
+            /** Suppressed */
+            suppressed: boolean;
+            /** Change Available */
+            change_available: boolean;
+        };
+        /**
+         * Signal
+         * @description Whether the change from the first years to the last years stands out from the typical swing.
+         */
+        Signal: {
+            /**
+             * Verdict
+             * @enum {string}
+             */
+            verdict: "clear_growth" | "clear_decline" | "within_noise" | "not_enough_data";
+            /** Smoothed Change Pct */
+            smoothed_change_pct: number | null;
+            /** Times Typical Swing */
+            times_typical_swing: number | null;
+            /** Required Multiple */
+            required_multiple: number;
         };
         /** ValidationError */
         ValidationError: {
@@ -367,7 +361,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    get_city_summary_city_summary_get: {
+    get_focus_focus_get: {
         parameters: {
             query?: {
                 return_period?: number;
@@ -384,39 +378,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CitySummary"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_neighborhoods_neighborhoods_get: {
-        parameters: {
-            query?: {
-                return_period?: number;
-                year?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["NeighborhoodCollection"];
+                    "application/json": components["schemas"]["FocusView"];
                 };
             };
             /** @description Validation Error */
@@ -510,15 +472,13 @@ export interface operations {
             };
         };
     };
-    get_brief_brief__neighborhood_id__get: {
+    get_brief_brief_get: {
         parameters: {
             query?: {
                 return_period?: number;
             };
             header?: never;
-            path: {
-                neighborhood_id: string;
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
