@@ -144,3 +144,11 @@ None yet.
 - Evidence shown: the smoothed change against the typical yearly swing (`signal_noise_multiple` = 2), and flood-zone areas gaining against losing. The change balance counts 100 m areas as numbers only, with K applied in `suppression.py`.
 - Framing risk: one named neighborhood can read as a target list. Mitigation: the misuse notice and limits are one click away, the app says other neighborhoods also gained buildings, and imagery of plots stays in the pitch only, never in the app or the repo.
 - Opens on the 10-year scenario, where the signal is strongest (+31.8%, 6.4 times the swing). At 500 years the verdict is within noise (1.8 times). The verdict is shown for every scenario.
+
+## M7 briefs
+- Facts: a brief may state only what is in `BriefInput` (`api/schemas/brief_input.py`), built from the computed focus view. The prompt carries a glossary of the fields and rules for plain language, no blame, no links, no field names.
+- Checks, in `api/services/brief_writer.py` and `api/safety/`: every number must appear in the input (`number_check.py`), no banned term, 90 words or fewer, one paragraph, a finished sentence, the neighborhood named, no underscore, and the model's `finish_reason` must be STOP. Any failure stores the template instead.
+- Fallback and its label: a templated brief from the same facts, stored with source `template`. The UI footnote reads "Written from a fixed template and the numbers above." A Gemini brief reads "Written from the numbers above. Numbers checked."
+- Official pointers (at most two, from `config/resources.yaml`) are added by code after the checks, never written by the model. The file is empty until the human fills it.
+- Measured on 2026-11-08 with `gemini-3.5-flash`: 3 of 4 briefs pass per run. The rest fall back, usually for length or an added number. That is the checks working.
+- Windows gotcha: a stale user-level `GEMINI_API_KEY` environment variable overrides `.env`, because `uv run --env-file` does not override variables that already exist.

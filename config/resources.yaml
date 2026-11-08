@@ -1,2 +1,5 @@
-# HUMAN: add official preparedness links (PLAN.md M7). Briefs may point only to these.
+# HUMAN: add official preparedness links (PLAN.md M7). Briefs may point only to these, at most two.
+# Each entry needs a title and a url, for example:
+#   - title: Name of the official guide
+#     url: https://example.org/guide
 resources: []

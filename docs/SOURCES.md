@@ -34,3 +34,10 @@ All checked 2026-11-07. City: Dhaka (see DECISIONS.md).
 - License: CC BY 3.0 IGO. Credit geoBoundaries in the README.
 - 40 units touch the box. 33 have at least half their area inside it and are kept, clipped to the box. See DECISIONS.md for the dropped ones.
 - Ward level was not found as open data. OpenStreetMap has one ward relation in the box (Mirpur 2). Thana level is the smallest unit we can source.
+
+## Gemini API (checked 2026-11-08)
+- Used for: plain-language briefs. Nothing else.
+- Model list: `GET https://generativelanguage.googleapis.com/v1beta/models` with the `x-goog-api-key` header. On this date `gemini-2.5-flash` returned 404 "no longer available to new users". `gemini-3.5-flash` answered in about one second and is set in `config/brief.yaml`. `gemini-3.8-flash` and `gemini-3.1-flash-lite` returned 504 deadline errors.
+- SDK: `google-genai`, `genai.Client(api_key=..., http_options=...)`, `client.models.generate_content(model, contents, config)`. The config sets `temperature`, `max_output_tokens` and `thinking_config`.
+- Finding: with default thinking, `gemini-3.5-flash` spent about 1,150 of 1,200 output tokens thinking and returned a cut-off answer (`finish_reason` MAX_TOKENS). `thinking_level` minimal fixes it. `thinking_budget` 0 also stops the cut-off but made the model repeat field names.
+- Key format: Google AI Studio keys are now 53 characters and do not start with `AIza`.

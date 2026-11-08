@@ -1,0 +1,3 @@
+# Model for briefs. Checked against the Gemini model list on 2026-11-08. Older names are retired for new users.
+model: gemini-3.5-flash
+timeout_seconds: 20
