@@ -24,7 +24,7 @@ export default tseslint.config(
         { selector: "function", format: ["camelCase", "PascalCase"] },
         { selector: "typeLike", format: ["PascalCase"] },
         { selector: "enumMember", format: ["UPPER_CASE", "PascalCase"] },
-        { selector: ["property", "parameter"], format: null },
+        { selector: ["property", "parameter", "objectLiteralMethod"], format: null },
         { selector: "import", format: null },
       ],
       "no-restricted-globals": ["error", { name: "fetch", message: "Use web/src/api/client.ts." }],

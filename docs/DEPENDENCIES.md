@@ -48,3 +48,5 @@ Styling is plain CSS Modules plus `web/src/styles/tokens.css`. It adds no depend
 - `pillow`: draw the before and after images used to review validation cells.
 - `psycopg-pool`: connection pool the API opens once at startup.
 - `uvicorn`: server that runs the API (`api/serve.py`).
+- `@tanstack/react-query`: the one data-fetching library for server data in the frontend.
+- `maplibre-gl`: the one map library, used only in `web/src/features/map/MapView.tsx`.

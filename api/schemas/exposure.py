@@ -63,4 +63,6 @@ class CitySummary(BaseModel):
     return_period: int
     first_year: int
     last_year: int
+    return_periods: list[int]
+    min_count_k: int
     years: list[CityYear]

@@ -305,6 +305,17 @@
             "type": "integer",
             "title": "Last Year"
           },
+          "return_periods": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Return Periods"
+          },
+          "min_count_k": {
+            "type": "integer",
+            "title": "Min Count K"
+          },
           "years": {
             "items": {
               "$ref": "#/components/schemas/CityYear"
@@ -319,6 +330,8 @@
           "return_period",
           "first_year",
           "last_year",
+          "return_periods",
+          "min_count_k",
           "years"
         ],
         "title": "CitySummary"

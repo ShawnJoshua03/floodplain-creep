@@ -1,0 +1,24 @@
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.method {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.heading {
+  font-size: var(--text-footnote);
+  line-height: var(--line-footnote);
+  color: var(--label-secondary);
+  padding: 0 var(--space-4);
+}
+
+.text {
+  font-size: var(--text-subhead);
+  line-height: var(--line-subhead);
+  padding: 0 var(--space-4);
+}

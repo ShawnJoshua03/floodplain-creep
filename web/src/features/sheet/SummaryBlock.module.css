@@ -1,0 +1,23 @@
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.label {
+  font-size: var(--text-subhead);
+  line-height: var(--line-subhead);
+  color: var(--label-secondary);
+}
+
+.value {
+  font-size: var(--text-title);
+  line-height: var(--line-title);
+  font-weight: var(--weight-semibold);
+}
+
+.note {
+  font-size: var(--text-footnote);
+  line-height: var(--line-footnote);
+  color: var(--label-secondary);
+}

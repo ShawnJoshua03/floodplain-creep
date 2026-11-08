@@ -128,3 +128,12 @@ None yet.
 ## Dark mode only (human decision, 2026-11-07)
 - The interface is dark only. The design references are Apple Maps, Find My, Weather and Music in dark mode (`docs/design-reference/`). One mode halves token, contrast and screenshot work.
 - Changed: CLAUDE.md, PLAN.md (M6a, M6c), DESIGN_RULES.md (modes, contrast, review gate), `tokens.css` (`color-scheme: dark`, no light values), and the design checker, which now requires `color-scheme: dark` instead of a dark media query.
+
+## M6b to M6e frontend choices
+- Types: `web/src/api/types.ts` renames generated schema types. It holds no hand-copied shapes. There is no runtime schema library in the approved stack, so `client.ts` checks that a response is a JSON object and trusts the generated types for the rest.
+- Navigation: `SheetPanel` derives the NavStack from the selection (a neighborhood) plus one local value (the accuracy view), instead of a separate reducer. A reducer would need syncing with the selection on every map click.
+- Map: colors come from CSS tokens once, when the map is created. A scheme-change listener is not needed because the app is dark only. Year changes cross-fade through feature state and a paint transition, so the geometry loads once per scenario. The dashed outline for suppressed neighborhoods uses line opacity, because the map library does not allow feature state in filters.
+- Color breaks: the five exposure groups come from the last year's shown counts, so one color means the same count in every year.
+- Brief: a missing brief is a normal answer (404 in the API), shown as "No written summary yet."
+- `CitySummary` now carries `return_periods` and `min_count_k`, so the frontend reads both from config through the API.
+- Dev server: Vite proxies the API paths to 127.0.0.1:8000. Hosting is an M8 decision.

@@ -151,6 +151,10 @@ export interface components {
             first_year: number;
             /** Last Year */
             last_year: number;
+            /** Return Periods */
+            return_periods: number[];
+            /** Min Count K */
+            min_count_k: number;
             /** Years */
             years: components["schemas"]["CityYear"][];
         };

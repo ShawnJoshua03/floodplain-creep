@@ -38,6 +38,8 @@ def test_suppressed_neighborhood_returns_null_counts(client: TestClient) -> None
 def test_city_summary_counts_shown_and_suppressed(client: TestClient) -> None:
     body = client.get("/city/summary", params={"return_period": 100}).json()
     assert body["city"] == "Dhaka"
+    assert body["return_periods"] == [10, 50, 100, 500]
+    assert body["min_count_k"] == 20
     by_year = {row["year"]: row for row in body["years"]}
     assert by_year[2023]["buildings_in_zone"] == 120
     assert by_year[2023]["new_buildings_in_zone"] == 40

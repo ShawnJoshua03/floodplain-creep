@@ -1,0 +1,74 @@
+.key {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-group);
+  background: var(--bg-row);
+}
+
+.heading {
+  font-size: var(--text-subhead);
+  line-height: var(--line-subhead);
+}
+
+.scale {
+  position: relative;
+  display: flex;
+  gap: var(--space-4);
+  height: var(--depth-key-height);
+}
+
+.person {
+  position: relative;
+  align-self: flex-end;
+  height: calc(var(--depth-key-height) * var(--person-share));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--label-secondary);
+}
+
+.figure {
+  flex: 1;
+  width: auto;
+  fill: currentcolor;
+}
+
+.personLabel {
+  font-size: var(--text-caption);
+  line-height: var(--line-caption);
+  color: var(--label-secondary);
+}
+
+.bins {
+  position: relative;
+  flex: 1;
+}
+
+.bin {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--depth-key-height) * var(--from) + var(--depth-key-gap));
+  height: calc(var(--depth-key-height) * (var(--to) - var(--from)) - var(--depth-key-gap));
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-footnote);
+  line-height: var(--line-footnote);
+}
+
+.swatch {
+  flex: none;
+  align-self: stretch;
+  width: var(--space-6);
+  border-radius: var(--space-1);
+  background: var(--bin-color);
+}
+
+.note {
+  font-size: var(--text-footnote);
+  line-height: var(--line-footnote);
+  color: var(--label-secondary);
+}

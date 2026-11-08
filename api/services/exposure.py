@@ -17,6 +17,8 @@ def city_summary(conn: psycopg.Connection, settings: Settings, return_period: in
         return_period=return_period,
         first_year=settings.first_year,
         last_year=settings.last_year,
+        return_periods=settings.return_periods,
+        min_count_k=settings.min_count_k,
         years=fetch_city_years(conn, return_period),
     )
 

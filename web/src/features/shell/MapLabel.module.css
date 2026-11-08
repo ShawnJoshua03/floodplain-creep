@@ -1,0 +1,12 @@
+.label {
+  position: fixed;
+  z-index: 1;
+  top: var(--space-3);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-control);
+  font-size: var(--text-subhead);
+  line-height: var(--line-subhead);
+  pointer-events: none;
+}
