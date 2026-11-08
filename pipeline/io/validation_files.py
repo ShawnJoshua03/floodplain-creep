@@ -145,3 +145,18 @@ def read_final_labels(path: Path = FINAL_LABELS_PATH) -> list[tuple[str, str]]:
     """Return (cell_id, label) in sheet order."""
     with path.open(newline="", encoding="utf-8") as handle:
         return [(r["cell_id"], r["label"]) for r in csv.DictReader(handle)]
+
+
+def read_design_cells(path: Path = DESIGN_PATH) -> list[tuple[str, int, int, str]]:
+    """Return (cell_id, row, col, sample_type) for each sampled cell."""
+    with path.open(newline="", encoding="utf-8") as handle:
+        return [(r["cell_id"], int(r["row"]), int(r["col"]), r["sample_type"]) for r in csv.DictReader(handle)]
+
+
+def rewrite_design_changes(changes: dict[str, float], path: Path = DESIGN_PATH) -> None:
+    """Replace the change column. Cell ids, positions and sample types stay as drawn."""
+    cells = read_design_cells(path)
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(["cell_id", "row", "col", "sample_type", "change"])
+        writer.writerows([cell_id, row, col, kind, changes[cell_id]] for cell_id, row, col, kind in cells)

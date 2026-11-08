@@ -7,7 +7,7 @@ seed: 42
 
 # Imagery used to review cells (Esri World Imagery Wayback release dates, and map zoom).
 # The release date is not the capture date. Captures are read per cell and saved.
-wayback_start_release: "2017-11-16"
+wayback_start_release: "2019-12-12"
 wayback_end_release: "2024-12-12"
 wayback_zoom: 18
 

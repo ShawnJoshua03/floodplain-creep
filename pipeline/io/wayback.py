@@ -16,6 +16,7 @@ CONFIG_URL = "https://s3-us-west-2.amazonaws.com/config.maptiles.arcgis.com/wayb
 HEADERS = {"User-Agent": "floodplain-creep-research/0.1"}
 TIMEOUT = httpx.Timeout(60.0)
 METADATA_LAYERS = (3, 4, 5, 6, 7)
+RETRIES = 4
 
 
 @dataclass(frozen=True)
@@ -32,9 +33,16 @@ class Capture:
     resolution_m: float
 
 
-def load_releases() -> dict[str, Release]:
-    response = httpx.get(CONFIG_URL, headers=HEADERS, timeout=TIMEOUT)
+def get(url: str, params: dict[str, str] | None = None) -> httpx.Response:
+    """GET with connection retries. A failed request after the retries raises."""
+    with httpx.Client(transport=httpx.HTTPTransport(retries=RETRIES), headers=HEADERS, timeout=TIMEOUT) as client:
+        response = client.get(url, params=params, follow_redirects=True)
     response.raise_for_status()
+    return response
+
+
+def load_releases() -> dict[str, Release]:
+    response = get(CONFIG_URL)
     releases: dict[str, Release] = {}
     for entry in response.json().values():
         match = re.search(r"\d{4}-\d{2}-\d{2}", entry["itemTitle"])
@@ -45,8 +53,7 @@ def load_releases() -> dict[str, Release]:
 
 def fetch_tile(release: Release, zoom: int, tile_x: int, tile_y: int) -> Image.Image:
     url = release.tile_url.format(level=zoom, row=tile_y, col=tile_x)
-    response = httpx.get(url, headers=HEADERS, timeout=TIMEOUT, follow_redirects=True)
-    response.raise_for_status()
+    response = get(url)
     return Image.open(io.BytesIO(response.content)).convert("RGB")
 
 
@@ -70,8 +77,7 @@ def capture_at(release: Release, lon: float, lat: float) -> Capture | None:
             "returnGeometry": "false",
             "f": "json",
         }
-        response = httpx.get(f"{release.metadata_url}/{layer}/query", params=params, headers=HEADERS, timeout=TIMEOUT)
-        response.raise_for_status()
+        response = get(f"{release.metadata_url}/{layer}/query", params)
         features = response.json().get("features", [])
         if features:
             attrs = features[0]["attributes"]

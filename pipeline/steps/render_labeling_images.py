@@ -1,7 +1,8 @@
 """Render before and after images for the cells in the labeling sheet.
 
 Run: uv run python -m pipeline.steps.render_labeling_images [cell_id ...]
-With no ids, every cell in the sheet is rendered. Output goes to data/processed/labeling_images/.
+With no ids, every cell in the sheet is rendered. Existing images are kept, so a failed run can be
+repeated. Output goes to data/processed/labeling_images/.
 Imagery: Esri World Imagery Wayback. The header of each image shows the true capture date.
 """
 
@@ -12,12 +13,12 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 
 from pipeline.io.city_config import ROOT
-from pipeline.io.labeling_images import render_cell
+from pipeline.io.labeling_images import capture_pair, render_cell
 from pipeline.io.validation_files import SHEET_PATH, load_validation_config, write_capture_rows
 from pipeline.io.wayback import load_releases
 
 IMAGES = ROOT / "data" / "processed" / "labeling_images"
-WORKERS = 6
+WORKERS = 4
 
 
 def main() -> None:
@@ -33,7 +34,11 @@ def main() -> None:
 
     def work(cell: tuple[str, float, float]) -> list[str]:
         cell_id, lon, lat = cell
-        found = render_cell(start, end, lon, lat, settings.wayback_zoom, IMAGES / f"{cell_id}.png")
+        image = IMAGES / f"{cell_id}.png"
+        if image.exists():
+            found = capture_pair(start, end, lon, lat)
+        else:
+            found = render_cell(start, end, lon, lat, settings.wayback_zoom, image)
         row = [cell_id]
         for capture in (found.start, found.end):
             row += (

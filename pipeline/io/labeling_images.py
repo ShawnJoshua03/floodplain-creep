@@ -40,8 +40,12 @@ def render_panel(release: Release, lon: float, lat: float, zoom: int) -> Image.I
     return panel
 
 
+def capture_pair(start: Release, end: Release, lon: float, lat: float) -> CellCaptures:
+    return CellCaptures(capture_at(start, lon, lat), capture_at(end, lon, lat))
+
+
 def render_cell(start: Release, end: Release, lon: float, lat: float, zoom: int, destination: Path) -> CellCaptures:
-    captures = CellCaptures(capture_at(start, lon, lat), capture_at(end, lon, lat))
+    captures = capture_pair(start, end, lon, lat)
     canvas = Image.new("RGB", (2 * PANEL_PX, PANEL_PX + HEADER_PX), BAND)
     canvas.paste(render_panel(start, lon, lat, zoom), (0, HEADER_PX))
     canvas.paste(render_panel(end, lon, lat, zoom), (PANEL_PX, HEADER_PX))
