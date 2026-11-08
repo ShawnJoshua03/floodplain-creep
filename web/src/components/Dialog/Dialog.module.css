@@ -1,0 +1,33 @@
+.dialog {
+  width: min(var(--dialog-width), calc(100% - var(--space-8)));
+  max-height: 80dvh;
+  padding: var(--space-5);
+  border: 0;
+  border-radius: var(--radius-sheet);
+  color: var(--label);
+  overflow-y: auto;
+}
+
+.dialog::backdrop {
+  background: var(--backdrop-dialog);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.title {
+  font-size: var(--text-headline);
+  line-height: var(--line-headline);
+  font-weight: var(--weight-semibold);
+}
+
+.done {
+  min-height: var(--hit-target);
+  color: var(--accent);
+  font-weight: var(--weight-semibold);
+}

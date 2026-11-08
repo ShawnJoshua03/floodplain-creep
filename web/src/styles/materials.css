@@ -1,5 +1,6 @@
 .chrome {
   background: var(--chrome-bg);
+  box-shadow: var(--shadow-floating);
 }
 
 @supports (backdrop-filter: blur(1px)) {
@@ -10,7 +11,7 @@
 
 @media (prefers-reduced-transparency: reduce) {
   .chrome {
-    background: var(--bg);
+    background: var(--bg-row);
     backdrop-filter: none;
   }
 }

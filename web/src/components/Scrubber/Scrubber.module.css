@@ -1,0 +1,36 @@
+.scrubber {
+  position: fixed;
+  z-index: 1;
+  left: 50%;
+  bottom: var(--space-4);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: min(var(--scrubber-width), calc(100% - var(--space-8)));
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sheet);
+}
+
+.play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: var(--hit-target);
+  height: var(--hit-target);
+  color: var(--label);
+}
+
+.range {
+  flex: 1;
+  min-width: 0;
+  height: var(--hit-target);
+  accent-color: var(--accent);
+}
+
+.year {
+  font-size: var(--text-title);
+  line-height: var(--line-title);
+  font-weight: var(--weight-semibold);
+}

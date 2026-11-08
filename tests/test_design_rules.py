@@ -9,8 +9,7 @@ from types import ModuleType
 
 import pytest
 
-TOKENS_CSS = """:root { color-scheme: light dark; --accent: #007aff; --text-body: 1.0625rem; }
-@media (prefers-color-scheme: dark) { :root { --accent: #0a84ff; } }
+TOKENS_CSS = """:root { color-scheme: dark; --accent: #007aff; --text-body: 1.0625rem; }
 """
 BASE_CSS = "button:focus-visible { outline: var(--focus-ring); outline-offset: var(--space-1); }\n"
 MOTION_CSS = "@media (prefers-reduced-motion: reduce) { :root { --duration-base: 0ms; } }\n"

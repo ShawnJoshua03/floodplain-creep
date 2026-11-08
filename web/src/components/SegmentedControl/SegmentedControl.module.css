@@ -1,0 +1,43 @@
+.group {
+  display: flex;
+  gap: var(--hairline);
+  margin: 0;
+  padding: var(--space-1);
+  border: var(--hairline) solid var(--control-edge);
+  border-radius: var(--radius-control);
+  background: var(--fill-control);
+}
+
+.option {
+  position: relative;
+  flex: 1;
+}
+
+.input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(var(--hit-target) - var(--space-2));
+  border-radius: calc(var(--radius-control) - var(--space-1));
+  font-size: var(--text-subhead);
+  line-height: var(--line-subhead);
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.input:checked + .face {
+  background: var(--fill-control-selected);
+  font-weight: var(--weight-semibold);
+}
+
+.input:focus-visible + .face {
+  outline: var(--focus-ring);
+  outline-offset: var(--space-1);
+}

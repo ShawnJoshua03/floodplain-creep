@@ -232,7 +232,7 @@ def check_required_features(root: Path, files: list[Path], report: list[str]) ->
         return
     if not (root / TOKENS).exists():
         report.append(f"{TOKENS}:1: token file is missing")
-    require(root, TOKENS, ("color-scheme", "prefers-color-scheme: dark"), report)
+    require(root, TOKENS, ("color-scheme: dark",), report)
     require(root, BASE, (":focus-visible",), report)
     require(root, MOTION, ("prefers-reduced-motion",), report)
     require(root, MATERIALS, ("prefers-reduced-transparency", "@supports"), report)

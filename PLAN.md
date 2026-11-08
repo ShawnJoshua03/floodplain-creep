@@ -175,12 +175,12 @@ is in the repo.
 
 ### M6a. Design foundation (before any feature)
 
-- `web/src/styles/tokens.css`: every token from DESIGN_RULES.md section 3, with light and dark
+- `web/src/styles/tokens.css`: every token from DESIGN_RULES.md section 3. Dark only.
   values. `base.css`: reset, body, tabular numerals, and the `:focus-visible` ring.
   `materials.css`: the chrome material with solid fallbacks for browsers without blur and for
   reduced transparency. `motion.css`: reduced-motion handling.
 - A contrast test over `tokens.css`. It reads the file, computes the contrast ratio for every
-  listed text, icon, and control pair in both modes, and fails below 4.5 to 1 for text or 3 to 1
+  listed text, icon, and control pair in dark mode, and fails below 4.5 to 1 for text or 3 to 1
   for icons and control edges. Tune the token values until it passes.
 - `web/src/components/icons/`: play, pause, chevron, info, check, and close, as inline SVG
   components. Colors come from CSS classes.
@@ -228,7 +228,7 @@ GATE M6a: show the contrast test output and a list of the primitives with their 
   named constant in `web/src/lib/`.
 - An info button at the top right opens the same Limits Dialog.
 
-Acceptance: the root view works against the real API in light and dark.
+Acceptance: the root view works against the real API in dark mode.
 
 ### M6d. Detail views
 

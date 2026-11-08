@@ -124,3 +124,7 @@ None yet.
 - Brief: `GET /brief/{id}` returns a stored brief only. A missing brief is a 404. Generation and the templated fallback arrive in M7. A stored brief that holds a banned term is logged and not served.
 - Overlay: `render_overlays.py` draws JRC depth in Web Mercator at 100 m, using the same flood-zone rule as the grid (minimum depth, no permanent water, no spurious depth). Images and `overlays.json` go to `data/processed/overlays/`. The API serves only files named in the manifest. The overlay is a hazard layer and holds no building data.
 - Validation: `GET /validation` returns the stored payload and `label_sources`, so the UI can say when labels are AI-made and not audited.
+
+## Dark mode only (human decision, 2026-11-07)
+- The interface is dark only. The design references are Apple Maps, Find My, Weather and Music in dark mode (`docs/design-reference/`). One mode halves token, contrast and screenshot work.
+- Changed: CLAUDE.md, PLAN.md (M6a, M6c), DESIGN_RULES.md (modes, contrast, review gate), `tokens.css` (`color-scheme: dark`, no light values), and the design checker, which now requires `color-scheme: dark` instead of a dark media query.

@@ -19,7 +19,7 @@ Core features:
 - A measured accuracy card, computed from hand-labeled satellite samples.
 - An honesty panel and a misuse notice that are always one click away.
 
-The interface is a full-bleed map with one floating sheet, in light and dark, styled to
+The interface is a full-bleed map with one floating sheet, in dark mode only, styled to
 feel like a native Apple-platform app. DESIGN_RULES.md defines the look.
 
 Anything not listed here or in PLAN.md is out of scope. Ask before adding it.

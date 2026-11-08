@@ -21,7 +21,7 @@ Tie-breaker for every choice: pick the quieter option. Remove before you add.
 
 - `scripts/check_design_rules.py`, run by `make design-check` and `make check`. It has tests in
   `tests/test_design_rules.py`. You may add checks. Never weaken one.
-- A contrast test over `web/src/styles/tokens.css` in light and dark modes.
+- A contrast test over `web/src/styles/tokens.css`.
 - The design review gate in section 9. A human looks at screenshots.
 - No new dependencies for design. No UI kit, no icon library, no animation library, no web
   fonts. Plain CSS Modules plus the token file.
@@ -54,19 +54,18 @@ If a check blocks you, fix the design. Do not work around the check.
 `web/src/styles/tokens.css` defines every color, size, radius, duration, easing, shadow, and
 font. Nothing else defines them. Components use `var(--token)` only.
 
-- Modes: `color-scheme: light dark`. Every color role has a light and a dark value.
+- Mode: dark only (human decision, 2026-11-07). `color-scheme: dark`. No light values and no mode switch.
 - Roles: `--bg`, `--bg-grouped`, `--bg-row`, `--label`, `--label-secondary`,
   `--label-tertiary`, `--separator`, `--accent`, `--accent-contrast`, `--fill-nodata`,
   `--chrome-bg` (the translucent color behind blur).
 - Data colors: `--ramp-exposure-1` to `--ramp-exposure-5` (one hue) and `--ramp-depth-1` to
   `--ramp-depth-4` (one blue hue). Each step differs in lightness, so the ramp works without
-  color vision. In dark mode the ramps run from dim to bright, so more exposure is more visible.
+  color vision. The ramps run from dim to bright, so more exposure is more visible.
   No red and green pairs. The accent is never a data color.
 - Contrast: text 4.5 to 1 or better, and icons and control boundaries 3 to 1 or better, in
-  both modes. The contrast test covers the listed pairs. Starting values to tune:
-  light `--bg #FFFFFF`, `--bg-grouped #F2F2F7`, `--accent #007AFF`; dark `--bg #000000`,
-  `--bg-row #1C1C1E`, `--accent #0A84FF`. Secondary labels must be darker than the usual
-  iOS defaults to pass 4.5 to 1.
+  dark mode. The contrast test covers the listed pairs. Starting values to tune:
+  `--bg #000000`, `--bg-grouped #0A0A0C`, `--bg-row #1C1C1E`, `--accent #0A84FF`. Secondary
+  labels must be lighter than the usual iOS defaults to pass 4.5 to 1.
 - Type: system stack only (`system-ui` first). Two weights only, 400 and 600. Scale:
   `--text-large-title` 2.125rem, `--text-title` 1.75rem, `--text-headline` 1.0625rem at 600,
   `--text-body` 1.0625rem, `--text-subhead` 0.9375rem, `--text-footnote` 0.8125rem,
@@ -139,13 +138,13 @@ placeholder text.
 - Use native elements and real labels. Announce year and scenario changes politely, for
   example "2019, 100-year flood, [N] exposed buildings".
 - The map has a text summary, and the ranked list is its accessible alternative.
-- Dark mode is a full equal, not a recolor afterthought.
+- Dark mode only. It is designed on purpose, not derived from a light theme.
 
 ## 9. Design review gate
 
 Claude Code prepares the screenshots. The human decides. Run at the end of M6 and again at M8.
 
-1. Capture 1440 by 900 and 390 by 844, in light and dark: root view, neighborhood detail,
+1. Capture 1440 by 900 and 390 by 844, in dark mode: root view, neighborhood detail,
    accuracy detail, the Limits dialog, and the loading, error, and not-enough-data states.
    Save them in `docs/design-review/`. Use browser tools, not a new dependency.
 2. Squint test. Is the hierarchy still clear when blurred?
