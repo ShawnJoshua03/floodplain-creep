@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
+from api.schemas.geometry import MultiPolygonGeometry, PolygonGeometry
+
 
 class DepthBin(BaseModel):
     min_depth_m: float
@@ -25,3 +27,10 @@ class OverlayInfo(BaseModel):
     bounds: list[float]
     bins: list[DepthBin]
     label: str
+
+
+class WaterLayer(BaseModel):
+    """Permanent water, for orientation on the map. It holds no buildings."""
+
+    label: str
+    geometry: MultiPolygonGeometry | PolygonGeometry | None

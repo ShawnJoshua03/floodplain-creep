@@ -3,7 +3,7 @@ import tokensCss from "./tokens.css?raw";
 const TEXT_MIN = 4.5;
 const GRAPHIC_MIN = 3;
 const STEP_MIN = 1.2;
-const NODATA_MIN = 1.3;
+const WATER_MIN = 1.5;
 const DEPTH_FLOOR = 1.8;
 
 type Rgba = { r: number; g: number; b: number; a: number };
@@ -96,30 +96,27 @@ describe.each([
 });
 
 describe("data ramps", () => {
-  const exposure = [1, 2, 3, 4, 5].map((n) => `--ramp-exposure-${n}`);
   const depth = [1, 2, 3, 4].map((n) => `--ramp-depth-${n}`);
 
-  it.each([
-    ["exposure", exposure],
-    ["depth", depth],
-  ])("the %s ramp gets brighter at every step and stays distinguishable", (_name, steps) => {
-    for (let index = 1; index < steps.length; index += 1) {
-      const lower = color(baseTokens, steps[index - 1] ?? "");
-      const higher = color(baseTokens, steps[index] ?? "");
-      expect(luminance(higher)).toBeGreaterThan(luminance(lower));
-      expect(ratio(higher, lower)).toBeGreaterThanOrEqual(STEP_MIN);
+  it("the depth ramp gets darker at every step and stays distinguishable", () => {
+    for (let index = 1; index < depth.length; index += 1) {
+      const shallower = color(baseTokens, depth[index - 1] ?? "");
+      const deeper = color(baseTokens, depth[index] ?? "");
+      expect(luminance(deeper)).toBeLessThan(luminance(shallower));
+      expect(ratio(shallower, deeper)).toBeGreaterThanOrEqual(STEP_MIN);
     }
   });
 
-  it("the no-data fill is distinguishable from every exposure step", () => {
-    for (const step of exposure) {
-      expect(ratio(color(baseTokens, step), color(baseTokens, "--fill-nodata"))).toBeGreaterThanOrEqual(NODATA_MIN);
-    }
-  });
-
-  it("the dimmest depth step still shows against the map background", () => {
-    expect(ratio(color(baseTokens, "--ramp-depth-1"), color(baseTokens, "--bg-grouped"))).toBeGreaterThanOrEqual(
+  it("the deepest, darkest depth step still shows against the map background", () => {
+    expect(ratio(color(baseTokens, "--ramp-depth-4"), color(baseTokens, "--bg-grouped"))).toBeGreaterThanOrEqual(
       DEPTH_FLOOR,
+    );
+  });
+
+  it("permanent water shows against the background and differs from the deepest flood step", () => {
+    expect(ratio(color(baseTokens, "--map-water"), color(baseTokens, "--bg-grouped"))).toBeGreaterThanOrEqual(WATER_MIN);
+    expect(ratio(color(baseTokens, "--map-water"), color(baseTokens, "--ramp-depth-4"))).toBeGreaterThanOrEqual(
+      STEP_MIN,
     );
   });
 });

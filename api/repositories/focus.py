@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from api.schemas.focus import Outline, SeriesYear
 
 OUTLINE_SQL = """
-    SELECT neighborhood_id, name, boundary_source, geometry
+    SELECT neighborhood_id, name, boundary_source, coverage::float8 AS coverage, geometry
     FROM neighborhoods
     WHERE name = %s
 """

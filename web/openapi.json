@@ -85,6 +85,24 @@
         }
       }
     },
+    "/hazard/water": {
+      "get": {
+        "summary": "Get Water",
+        "operationId": "get_water_hazard_water_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WaterLayer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/overlays/{filename}": {
       "get": {
         "summary": "Get Overlay Image",
@@ -583,6 +601,10 @@
             "type": "string",
             "title": "Boundary Source"
           },
+          "coverage": {
+            "type": "number",
+            "title": "Coverage"
+          },
           "geometry": {
             "anyOf": [
               {
@@ -600,6 +622,7 @@
           "neighborhood_id",
           "name",
           "boundary_source",
+          "coverage",
           "geometry"
         ],
         "title": "Outline"
@@ -907,6 +930,35 @@
           "created_at"
         ],
         "title": "ValidationResult"
+      },
+      "WaterLayer": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "geometry": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MultiPolygonGeometry"
+              },
+              {
+                "$ref": "#/components/schemas/PolygonGeometry"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Geometry"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "geometry"
+        ],
+        "title": "WaterLayer",
+        "description": "Permanent water, for orientation on the map. It holds no buildings."
       }
     }
   }

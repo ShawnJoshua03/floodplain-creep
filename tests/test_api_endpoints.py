@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any
 
 import psycopg
@@ -111,6 +112,21 @@ def test_overlay_info_and_image(client: TestClient) -> None:
     image = client.get(body["image_url"])
     assert image.status_code == 200
     assert image.headers["content-type"] == "image/png"
+
+
+def test_the_focus_outline_says_how_much_of_the_neighborhood_is_covered(client: TestClient) -> None:
+    assert focus(client)["neighborhood"]["coverage"] == 0.9
+
+
+def test_water_is_served_for_orientation_and_holds_no_buildings(client: TestClient) -> None:
+    body = client.get("/hazard/water").json()
+    assert body["geometry"]["type"] == "MultiPolygon"
+    assert "buildings" not in str(body).lower()
+
+
+def test_water_is_not_found_when_the_context_is_not_rendered(client: TestClient, tmp_path: Path) -> None:
+    (tmp_path / "overlays" / "context.json").unlink()
+    assert client.get("/hazard/water").status_code == 404
 
 
 def test_overlay_for_a_missing_return_period_is_not_found(client: TestClient) -> None:

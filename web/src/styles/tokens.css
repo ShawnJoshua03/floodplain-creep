@@ -8,7 +8,6 @@
   --bg-grouped: #0a0a0c;
   --bg-row: #1c1c1e;
   --chrome-bg: #1c1c1ecc;
-  --fill-nodata: #2c2c2e;
   --fill-control: #3a3a3c;
   --fill-control-selected: #636366;
 
@@ -23,16 +22,12 @@
   --accent: #0a84ff;
   --accent-contrast: #000000;
 
-  /* Data ramps. Dim to bright, one hue each. */
-  --ramp-exposure-1: #6b4f1a;
-  --ramp-exposure-2: #9a6f22;
-  --ramp-exposure-3: #c58c2c;
-  --ramp-exposure-4: #e8a93d;
-  --ramp-exposure-5: #ffc457;
-  --ramp-depth-1: #1e4f86;
-  --ramp-depth-2: #2d74c0;
-  --ramp-depth-3: #4a9aea;
-  --ramp-depth-4: #8fc8ff;
+  /* Depth ramp: shallow is pale, deep is dark and saturated, one hue. Water is the map context. */
+  --map-water: #24435c;
+  --ramp-depth-1: #9ad8f0;
+  --ramp-depth-2: #4fb3e8;
+  --ramp-depth-3: #1f7fd1;
+  --ramp-depth-4: #0a4fa8;
 
   /* Type */
   --text-large-title: 2.125rem;
@@ -78,6 +73,7 @@
   --switch-knob: 1.625rem;
   --scrubber-width: 22rem;
   --dialog-width: 26rem;
+  --legend-width: 15rem;
   --depth-key-height: 9rem;
   --depth-key-gap: 0.1875rem;
 
@@ -100,7 +96,6 @@
   --duration-base: 250ms;
   --duration-slow: 350ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
-  --map-fade: 400ms;
 }
 
 @media (prefers-contrast: more) {

@@ -2,8 +2,8 @@ import { useOverlay } from "../../api/hooks";
 import { InlineMessage } from "../../components/InlineMessage/InlineMessage";
 import { SwitchRow } from "../../components/SwitchRow/SwitchRow";
 import { useSelection } from "../../state/SelectionProvider";
-import { DepthKey } from "./DepthKey";
 
+/** The switch for the flood depth layer. The legend for its colors sits beside the map. */
 export function OverlayControls() {
   const { returnPeriod, overlayOn, setOverlay } = useSelection();
   const query = useOverlay(returnPeriod, overlayOn);
@@ -17,7 +17,6 @@ export function OverlayControls() {
           The flood depth layer did not load.
         </InlineMessage>
       ) : null}
-      {overlayOn && query.data ? <DepthKey bins={query.data.bins} /> : null}
     </>
   );
 }

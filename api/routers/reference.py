@@ -11,7 +11,7 @@ from fastapi.responses import FileResponse
 from api.core.dependencies import get_connection, get_settings
 from api.core.settings import Settings
 from api.schemas.brief import Brief, Limits
-from api.schemas.hazard import OverlayInfo
+from api.schemas.hazard import OverlayInfo, WaterLayer
 from api.schemas.validation import ValidationResult
 from api.services import briefs, hazard, limits, validation
 
@@ -24,6 +24,11 @@ AppSettings = Annotated[Settings, Depends(get_settings)]
 @router.get("/hazard/overlay", response_model=OverlayInfo)
 def get_overlay(settings: AppSettings, return_period: int = 100) -> OverlayInfo:
     return hazard.overlay_info(settings, return_period)
+
+
+@router.get("/hazard/water", response_model=WaterLayer)
+def get_water(settings: AppSettings) -> WaterLayer:
+    return hazard.water_layer(settings)
 
 
 @router.get("/overlays/{filename}", response_class=FileResponse)

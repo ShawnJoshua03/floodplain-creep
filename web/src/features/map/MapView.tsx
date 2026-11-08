@@ -1,22 +1,20 @@
-import { type GeoJSONSource, type ImageSource, Map as MapLibreMap } from "maplibre-gl";
+import { type GeoJSONSource, type ImageSource, Map as MapLibreMap, Marker, ScaleControl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useState } from "react";
 import { boundsOf } from "../../lib/geometryBounds";
 import styles from "./MapView.module.css";
 import {
   baseStyle,
-  FILL_LAYER,
-  fillColor,
-  fillOpacity,
-  focusLayers,
+  contextLayers,
+  FOCUS_SOURCE,
   OUTLINE_LAYER,
   OVERLAY_LAYER,
   OVERLAY_SOURCE,
   overlayLayer,
-  SOURCE_ID,
+  WATER_SOURCE,
 } from "./mapStyle";
 import { configureMapWorker } from "./mapWorker";
-import { type Palette, readPalette } from "./readPalette";
+import { readPalette } from "./readPalette";
 
 interface MapGeometry {
   type: "Polygon" | "MultiPolygon";
@@ -30,8 +28,9 @@ interface OverlayImage {
 
 interface MapViewProps {
   label: string;
+  name: string;
   geometry: MapGeometry | null;
-  bucket: number;
+  water: MapGeometry | null;
   overlay: OverlayImage | null;
 }
 
@@ -39,6 +38,7 @@ const DESKTOP_MIN_WIDTH = 900;
 const SHEET_PADDING_PX = 420;
 const EDGE_PADDING_PX = 48;
 const BOTTOM_PADDING_PX = 120;
+const EMPTY = { type: "FeatureCollection", features: [] } as const;
 
 function imageCoordinates(bounds: number[]): [[number, number], [number, number], [number, number], [number, number]] {
   const [west = 0, south = 0, east = 0, north = 0] = bounds;
@@ -51,10 +51,9 @@ function imageCoordinates(bounds: number[]): [[number, number], [number, number]
 }
 
 /** The only file that calls the map library. The map is driven from props through a ref. */
-export function MapView({ label, geometry, bucket, overlay }: MapViewProps) {
+export function MapView({ label, name, geometry, water, overlay }: MapViewProps) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
-  const palette = useRef<Palette | null>(null);
   const fitted = useRef(false);
   const [ready, setReady] = useState(false);
 
@@ -64,7 +63,6 @@ export function MapView({ label, geometry, bucket, overlay }: MapViewProps) {
     }
     configureMapWorker();
     const colors = readPalette();
-    palette.current = colors;
     const map = new MapLibreMap({
       container: container.current,
       style: baseStyle(colors),
@@ -75,9 +73,11 @@ export function MapView({ label, geometry, bucket, overlay }: MapViewProps) {
       pitchWithRotate: false,
     });
     mapRef.current = map;
+    map.addControl(new ScaleControl({ unit: "metric" }), "bottom-right");
     map.on("load", () => {
-      map.addSource(SOURCE_ID, { type: "geojson", data: { type: "FeatureCollection", features: [] } });
-      for (const layer of focusLayers(colors, 0, false)) {
+      map.addSource(WATER_SOURCE, { type: "geojson", data: EMPTY });
+      map.addSource(FOCUS_SOURCE, { type: "geojson", data: EMPTY });
+      for (const layer of contextLayers(colors)) {
         map.addLayer(layer);
       }
       setReady(true);
@@ -91,13 +91,24 @@ export function MapView({ label, geometry, bucket, overlay }: MapViewProps) {
 
   useEffect(() => {
     const map = mapRef.current;
-    const source = ready ? map?.getSource<GeoJSONSource>(SOURCE_ID) : undefined;
+    const source = ready ? map?.getSource<GeoJSONSource>(WATER_SOURCE) : undefined;
+    if (source) {
+      source.setData(water ? { type: "Feature", properties: {}, geometry: water } : EMPTY);
+    }
+  }, [water, ready]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const source = ready ? map?.getSource<GeoJSONSource>(FOCUS_SOURCE) : undefined;
     if (!map || !source || !geometry) {
-      return;
+      return undefined;
     }
     source.setData({ type: "Feature", properties: {}, geometry });
     const box = boundsOf([geometry]);
-    if (box && !fitted.current) {
+    if (!box) {
+      return undefined;
+    }
+    if (!fitted.current) {
       fitted.current = true;
       const wide = window.innerWidth >= DESKTOP_MIN_WIDTH;
       map.fitBounds(box, {
@@ -110,18 +121,14 @@ export function MapView({ label, geometry, bucket, overlay }: MapViewProps) {
         },
       });
     }
-  }, [geometry, ready]);
-
-  const overlayOn = overlay !== null;
-  useEffect(() => {
-    const map = mapRef.current;
-    const colors = palette.current;
-    if (!map || !colors || !ready) {
-      return;
-    }
-    map.setPaintProperty(FILL_LAYER, "fill-color", fillColor(colors, bucket));
-    map.setPaintProperty(FILL_LAYER, "fill-opacity", fillOpacity(overlayOn));
-  }, [bucket, overlayOn, ready]);
+    const element = document.createElement("div");
+    element.className = `${styles.nameLabel} chrome`;
+    element.textContent = name;
+    const marker = new Marker({ element }).setLngLat([(box[0] + box[2]) / 2, (box[1] + box[3]) / 2]).addTo(map);
+    return () => {
+      marker.remove();
+    };
+  }, [geometry, name, ready]);
 
   useEffect(() => {
     const map = mapRef.current;

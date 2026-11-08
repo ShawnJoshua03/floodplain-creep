@@ -152,3 +152,10 @@ None yet.
 - Official pointers (at most two, from `config/resources.yaml`) are added by code after the checks, never written by the model. The file is empty until the human fills it.
 - Measured on 2026-11-08 with `gemini-3.5-flash`: 3 of 4 briefs pass per run. The rest fall back, usually for length or an added number. That is the checks working.
 - Windows gotcha: a stale user-level `GEMINI_API_KEY` environment variable overrides `.env`, because `uv run --env-file` does not override variables that already exist.
+
+## Right-side redesign (map and sheet)
+- Map shows the Badda outline with its name, permanent water (`/hazard/water`, simplified 40 m, from the JRC water class), a scale bar, and a legend beside the map (depth ramp, person for scale, water swatch). Legend hides under 900 px.
+- Depth ramp runs pale (shallow) to dark (deep); token test enforces order and contrast against the map background.
+- Sheet leads with one takeaway sentence, then the count with a coverage note ("Counts cover N% of Badda, the part inside the study area"), then a chart with axis ticks, a labeled "usual yearly swing" band, and a faint line for later years.
+- Pressing play on the last year restarts from the first.
+- Fallback label unchanged: no new fallbacks.

@@ -23,10 +23,10 @@ class DepthBinSpec:
 
 
 DEPTH_BINS = [
-    DepthBinSpec(0.1, 0.5, (30, 79, 134)),
-    DepthBinSpec(0.5, 1.0, (45, 116, 192)),
-    DepthBinSpec(1.0, 2.0, (74, 154, 234)),
-    DepthBinSpec(2.0, None, (143, 200, 255)),
+    DepthBinSpec(0.1, 0.5, (154, 216, 240)),
+    DepthBinSpec(0.5, 1.0, (79, 179, 232)),
+    DepthBinSpec(1.0, 2.0, (31, 127, 209)),
+    DepthBinSpec(2.0, None, (10, 79, 168)),
 ]
 
 

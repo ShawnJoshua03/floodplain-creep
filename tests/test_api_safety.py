@@ -14,8 +14,22 @@ from api.safety.banned_terms import find_banned_terms
 from pipeline.io.city_config import load_city_config
 
 CELL_LEVEL_WORDS = {"cell", "row", "col", "lat", "lon", "latitude", "longitude", "x", "y", "building"}
-ALLOWED_PATHS = {"/focus", "/hazard/overlay", "/overlays/{filename}", "/validation", "/brief", "/limits"}
-ENDPOINTS = ["/focus?return_period=100", "/hazard/overlay?return_period=100", "/validation", "/limits"]
+ALLOWED_PATHS = {
+    "/focus",
+    "/hazard/overlay",
+    "/hazard/water",
+    "/overlays/{filename}",
+    "/validation",
+    "/brief",
+    "/limits",
+}
+ENDPOINTS = [
+    "/focus?return_period=100",
+    "/hazard/overlay?return_period=100",
+    "/hazard/water",
+    "/validation",
+    "/limits",
+]
 
 
 def all_keys(node: object) -> set[str]:

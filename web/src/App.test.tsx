@@ -41,8 +41,20 @@ describe("root view", () => {
     expect(screen.getByText("Dhaka")).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: "10-year" })).toBeChecked();
     expect(screen.getByText("Buildings in the modeled 10-year flood zone, 2023")).toBeInTheDocument();
-    expect(screen.getByText("38,936")).toBeInTheDocument();
-    expect(screen.getByText("+5,434 since 2018")).toBeInTheDocument();
+    expect(screen.getAllByText("38,936").length).toBeGreaterThan(0);
+    expect(screen.getByText(/\+5,434 since 2018\./)).toBeInTheDocument();
+    expect(screen.getByText(/Counts cover 94% of Badda, the part inside the study area/)).toBeInTheDocument();
+  });
+
+  it("leads with one sentence that states the claim", async () => {
+    installFetch(defaultRouter());
+    renderApp();
+    await ready();
+    expect(
+      screen.getByText(
+        "Buildings in Badda's 10-year flood zone grew 16% since 2018. That is 2.1 times the usual yearly swing.",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("shows the evidence rows and a sentence that says the growth is clear", async () => {
@@ -54,7 +66,7 @@ describe("root view", () => {
     expect(screen.getByText("2.1 times")).toBeInTheDocument();
     expect(screen.getByText("4.2 to 1")).toBeInTheDocument();
     expect(screen.getByText("1.4 to 1")).toBeInTheDocument();
-    expect(screen.getByText(/The growth in Badda is 2.1 times the usual swing/)).toBeInTheDocument();
+    expect(screen.getByText(/by 4.2 to 1 in Badda, against 1.4 to 1 in the rest of the city/)).toBeInTheDocument();
     expect(screen.getByText(/Other neighborhoods also gained buildings/)).toBeInTheDocument();
   });
 
@@ -62,14 +74,14 @@ describe("root view", () => {
     installFetch(defaultRouter({ "/focus": () => ({ body: focusView(10, { verdict: "within_noise" }) }) }));
     renderApp();
     await ready();
-    expect(screen.getByText(/below the 2 times needed to call it clear/)).toBeInTheDocument();
+    expect(screen.getByText(/within the usual yearly swing, so it is not clearly real/)).toBeInTheDocument();
   });
 
   it("says when there is not enough data to judge", async () => {
     installFetch(defaultRouter({ "/focus": () => ({ body: focusView(10, { verdict: "not_enough_data", withNoise: false }) }) }));
     renderApp();
     await ready();
-    expect(screen.getByText(/not enough data to say whether the change in Badda/)).toBeInTheDocument();
+    expect(screen.getByText("There is not enough data to judge the change in Badda's 10-year flood zone.")).toBeInTheDocument();
     expect(screen.getByText("Not enough data to draw the usual yearly swing.")).toBeInTheDocument();
   });
 

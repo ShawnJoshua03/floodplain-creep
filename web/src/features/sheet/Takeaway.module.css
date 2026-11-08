@@ -1,0 +1,5 @@
+.takeaway {
+  font-size: var(--text-headline);
+  line-height: var(--line-headline);
+  font-weight: var(--weight-semibold);
+}

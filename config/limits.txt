@@ -7,3 +7,4 @@ Flood scenarios are simulated. They are not a forecast.
 Results are shown by neighborhood. Neighborhoods with too few buildings show "not enough data".
 This is not an official warning.
 This is not for enforcement against residents. See the misuse notice.
+Counts cover the part of the neighborhood inside the study area. The neighborhood outline is cut at its edge.

@@ -7,7 +7,7 @@ Needs the outputs of fetch_flood. The images show modeled depth only, with no bu
 from __future__ import annotations
 
 from pipeline.io.city_config import ROOT, load_city_config
-from pipeline.io.overlay_files import render_depth_png, write_manifest
+from pipeline.io.overlay_files import render_depth_png, water_geometry, write_context, write_manifest
 from pipeline.steps.build_grid import FLOOD, find_flood_file
 
 OUTPUT = ROOT / "data" / "processed" / "overlays"
@@ -26,7 +26,8 @@ def main() -> None:
         images[return_period] = name
         print(f"Wrote {name}")
     write_manifest(OUTPUT, config.bbox, images)
-    print(f"Wrote overlays.json in {OUTPUT.relative_to(ROOT).as_posix()}")
+    write_context(OUTPUT, water_geometry(water, config.bbox))
+    print(f"Wrote overlays.json and context.json in {OUTPUT.relative_to(ROOT).as_posix()}")
 
 
 if __name__ == "__main__":

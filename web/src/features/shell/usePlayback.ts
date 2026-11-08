@@ -6,8 +6,16 @@ interface Playback {
   toggle: () => void;
 }
 
-/** Steps the year forward while playing and stops at the last year. It never starts by itself. */
-export function usePlayback(year: number, lastYear: number, setYear: (year: number) => void): Playback {
+/**
+ * Steps the year forward while playing and stops at the last year. It never starts by itself.
+ * Pressing play on the last year starts again from the first.
+ */
+export function usePlayback(
+  year: number,
+  firstYear: number,
+  lastYear: number,
+  setYear: (year: number) => void,
+): Playback {
   const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
@@ -27,7 +35,7 @@ export function usePlayback(year: number, lastYear: number, setYear: (year: numb
 
   function toggle() {
     if (!playing && year >= lastYear) {
-      return;
+      setYear(firstYear);
     }
     setPlaying(!playing);
   }

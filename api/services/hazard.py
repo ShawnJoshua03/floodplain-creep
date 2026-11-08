@@ -9,10 +9,11 @@ from pydantic import ValidationError
 
 from api.core.errors import NotFoundError
 from api.core.settings import Settings
-from api.schemas.hazard import OverlayInfo, OverlayManifest
+from api.schemas.hazard import OverlayInfo, OverlayManifest, WaterLayer
 from api.services.choices import require_return_period
 
 MANIFEST_NAME = "overlays.json"
+CONTEXT_NAME = "context.json"
 OVERLAY_URL_PREFIX = "/overlays"
 OVERLAY_LABEL = "Modeled river flood depth. Simulated scenario, not a forecast."
 
@@ -47,3 +48,14 @@ def overlay_info(settings: Settings, return_period: int) -> OverlayInfo:
         bins=manifest.bins,
         label=OVERLAY_LABEL,
     )
+
+
+def water_layer(settings: Settings) -> WaterLayer:
+    path = settings.overlay_dir / CONTEXT_NAME
+    if not path.exists():
+        raise NotFoundError("The map context is not rendered yet. Run pipeline.steps.render_overlays.")
+    try:
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+        return WaterLayer(label=loaded["label"], geometry=loaded["water"])
+    except (json.JSONDecodeError, KeyError, ValidationError) as error:
+        raise NotFoundError(f"The map context is not readable: {error}") from error

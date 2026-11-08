@@ -1,32 +1,21 @@
-import { baseStyle, fillColor, fillOpacity, focusLayers, OUTLINE_LAYER } from "./mapStyle";
+import { baseStyle, contextLayers, OUTLINE_LAYER, overlayLayer, WATER_LAYER } from "./mapStyle";
 import type { Palette } from "./readPalette";
 
-const palette: Palette = {
-  background: "bg",
-  separator: "sep",
-  accent: "accent",
-  noData: "nodata",
-  exposure: ["e1", "e2", "e3", "e4", "e5"],
-  fadeMs: 400,
-};
+const palette: Palette = { background: "bg", accent: "accent", water: "water" };
 
 describe("mapStyle", () => {
   it("has no basemap sources", () => {
     expect(baseStyle(palette).sources).toEqual({});
   });
 
-  it("reads the exposure ramp by bucket and uses the no-data fill for bucket 0", () => {
-    expect(fillColor(palette, 1)).toBe("e1");
-    expect(fillColor(palette, 5)).toBe("e5");
-    expect(fillColor(palette, 0)).toBe("nodata");
+  it("draws water under the outline, and the outline in the accent color", () => {
+    const layers = contextLayers(palette);
+    expect(layers.map((layer) => layer.id)).toEqual([WATER_LAYER, OUTLINE_LAYER]);
+    expect(layers[0]?.paint).toMatchObject({ "fill-color": "water" });
+    expect(layers[1]?.paint).toMatchObject({ "line-color": "accent" });
   });
 
-  it("dims the fill while the depth overlay is on", () => {
-    expect(fillOpacity(true)).toBeLessThan(fillOpacity(false));
-  });
-
-  it("outlines the neighborhood in the accent color", () => {
-    const outline = focusLayers(palette, 3, false).find((layer) => layer.id === OUTLINE_LAYER);
-    expect(outline?.paint).toMatchObject({ "line-color": "accent" });
+  it("softens the depth image with linear resampling", () => {
+    expect(overlayLayer().paint).toMatchObject({ "raster-resampling": "linear" });
   });
 });

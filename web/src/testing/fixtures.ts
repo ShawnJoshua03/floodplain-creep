@@ -21,7 +21,7 @@ export function focusView(returnPeriod: number, options: FocusOptions = {}): Foc
     first_year: 2018,
     last_year: 2023,
     min_count_k: 20,
-    neighborhood: { neighborhood_id: "n1", name: "Badda", boundary_source: "test", geometry: POLYGON },
+    neighborhood: { neighborhood_id: "n1", name: "Badda", boundary_source: "test", coverage: 0.943, geometry: POLYGON },
     series: counts.map((count, index) => ({
       year: 2018 + index,
       buildings_in_zone: count,

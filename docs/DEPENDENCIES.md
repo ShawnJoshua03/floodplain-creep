@@ -40,6 +40,7 @@ Styling is plain CSS Modules plus `web/src/styles/tokens.css`. It adds no depend
 - `types-pyyaml`: type stubs for pyyaml.
 - `geopandas`: read boundary polygons and reproject them.
 - `shapely`: polygon geometry for neighborhoods.
+- `pyproj`: converts the water outline from the metric grid to lon/lat for the map.
 - `types-shapely`: type stubs for shapely.
 - `types-geopandas`: type stubs for geopandas.
 - `pandas-stubs`: type stubs for pandas, which geopandas uses.

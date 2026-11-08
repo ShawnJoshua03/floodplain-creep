@@ -26,6 +26,7 @@ class Outline(BaseModel):
     neighborhood_id: str
     name: str
     boundary_source: str
+    coverage: float
     geometry: PolygonGeometry | MultiPolygonGeometry
 
 

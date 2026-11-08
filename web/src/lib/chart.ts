@@ -24,18 +24,53 @@ interface Plotted {
   y: number;
 }
 
+interface Tick {
+  value: number;
+  y: number;
+}
+
 export interface ChartLayout {
   points: Plotted[];
-  /** Line segments, one per run of years with a count. A suppressed year breaks the line. */
+  /** Line segments for years up to the selected year. A suppressed year breaks the line. */
   paths: string[];
+  /** Line segments from the selected year onward, drawn faint so the climb is revealed as the year moves. */
+  ghostPaths: string[];
   band: { top: number; height: number } | null;
+  /** The lowest and highest values on the axis. */
+  ticks: Tick[];
+}
+
+function toPath(run: Plotted[]): string {
+  return run.map((point, index) => `${index === 0 ? "M" : "L"}${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(" ");
+}
+
+/** Runs of consecutive years that have a count and pass the test. Each run needs two points to draw. */
+function runs(points: ChartPoint[], plotted: Plotted[], keep: (year: number) => boolean): string[] {
+  const paths: string[] = [];
+  let run: Plotted[] = [];
+  const flush = () => {
+    if (run.length > 1) {
+      paths.push(toPath(run));
+    }
+    run = [];
+  };
+  for (const point of points) {
+    const found = plotted.find((item) => item.year === point.year);
+    if (found && keep(point.year)) {
+      run.push(found);
+    } else {
+      flush();
+    }
+  }
+  flush();
+  return paths;
 }
 
 /** Turn yearly counts and a noise band into SVG coordinates. Counts and years only, no drawing. */
-export function layoutChart(points: ChartPoint[], band: Band | null, frame: Frame): ChartLayout {
+export function layoutChart(points: ChartPoint[], band: Band | null, frame: Frame, upToYear: number): ChartLayout {
   const shown = points.filter((point): point is { year: number; count: number } => point.count !== null);
   if (shown.length === 0) {
-    return { points: [], paths: [], band: null };
+    return { points: [], paths: [], ghostPaths: [], band: null, ticks: [] };
   }
   const counts = shown.map((point) => point.count);
   const bandLow = band ? band.center * (1 - band.swingPct / 100) : Infinity;
@@ -52,27 +87,14 @@ export function layoutChart(points: ChartPoint[], band: Band | null, frame: Fram
   const toY = (count: number) => frame.padTop + (1 - (count - low) / span) * innerHeight;
 
   const plotted = shown.map((point) => ({ ...point, x: toX(point.year), y: toY(point.count) }));
-  const paths: string[] = [];
-  let run: Plotted[] = [];
-  for (const point of points) {
-    const found = plotted.find((item) => item.year === point.year);
-    if (found) {
-      run.push(found);
-    } else if (run.length > 0) {
-      paths.push(toPath(run));
-      run = [];
-    }
-  }
-  if (run.length > 0) {
-    paths.push(toPath(run));
-  }
   return {
     points: plotted,
-    paths,
+    paths: runs(points, plotted, (year) => year <= upToYear),
+    ghostPaths: runs(points, plotted, (year) => year >= upToYear),
     band: band ? { top: toY(bandHigh), height: toY(bandLow) - toY(bandHigh) } : null,
+    ticks: [
+      { value: high, y: toY(high) },
+      { value: low, y: toY(low) },
+    ],
   };
-}
-
-function toPath(run: Plotted[]): string {
-  return run.map((point, index) => `${index === 0 ? "M" : "L"}${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(" ");
 }

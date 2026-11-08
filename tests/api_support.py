@@ -84,6 +84,8 @@ def write_overlay_files(overlay_dir: Path) -> None:
         "images": {"100": "depth_rp100.png"},
     }
     (overlay_dir / "overlays.json").write_text(json.dumps(manifest), encoding="utf-8")
+    water = {"type": "MultiPolygon", "coordinates": [[[[90.4, 23.7], [90.41, 23.7], [90.41, 23.71], [90.4, 23.7]]]]}
+    (overlay_dir / "context.json").write_text(json.dumps({"label": "Test water", "water": water}), encoding="utf-8")
 
 
 def api_settings(database_url: str, schema_name: str, overlay_dir: Path) -> Settings:

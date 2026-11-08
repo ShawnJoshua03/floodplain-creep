@@ -6,6 +6,7 @@ const points = [
   { year: 2019, count: 1100 },
   { year: 2020, count: null },
   { year: 2021, count: 1300 },
+  { year: 2022, count: 1350 },
 ];
 
 describe("EvidenceChart", () => {
@@ -17,11 +18,17 @@ describe("EvidenceChart", () => {
     expect(label).toContain("shaded band");
   });
 
-  it("marks the selected year and draws one dot per shown year", () => {
-    const { container } = render(
-      <EvidenceChart points={points} band={null} selectedYear={2019} caption="Caption" />,
-    );
-    expect(container.querySelectorAll("circle")).toHaveLength(3);
+  it("labels the band and the value axis", () => {
+    render(<EvidenceChart points={points} band={{ center: 1000, swingPct: 5 }} selectedYear={2022} caption="Caption" />);
+    expect(screen.getByText("usual yearly swing")).toBeInTheDocument();
+    expect(screen.getByText("1,350")).toBeInTheDocument();
+    expect(screen.getByText("950")).toBeInTheDocument();
+  });
+
+  it("draws one dot per shown year and leaves out the band label when there is no band", () => {
+    const { container } = render(<EvidenceChart points={points} band={null} selectedYear={2019} caption="Caption" />);
+    expect(container.querySelectorAll("circle")).toHaveLength(4);
+    expect(screen.queryByText("usual yearly swing")).not.toBeInTheDocument();
   });
 
   it("shows its caption", () => {

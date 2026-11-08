@@ -22,16 +22,37 @@
   fill: var(--fill-control);
 }
 
+.bandLabel {
+  fill: var(--label-secondary);
+  font-size: var(--text-caption);
+}
+
+.grid {
+  stroke: var(--separator);
+  stroke-width: var(--hairline);
+}
+
 .line {
   fill: none;
-  stroke: var(--label-secondary);
+  stroke: var(--label);
   stroke-width: var(--icon-stroke);
   stroke-linejoin: round;
   stroke-linecap: round;
 }
 
+.ghost {
+  fill: none;
+  stroke: var(--label-tertiary);
+  stroke-width: var(--hairline);
+  stroke-dasharray: 3 4;
+}
+
 .dot {
-  fill: var(--label-secondary);
+  fill: var(--label);
+}
+
+.dotAhead {
+  fill: var(--label-tertiary);
 }
 
 .selected {

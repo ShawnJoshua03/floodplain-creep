@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getJson, isNotFound } from "./client";
-import type { Brief, FocusView, Limits, OverlayInfo, ValidationResult } from "./types";
+import type { Brief, FocusView, Limits, OverlayInfo, ValidationResult, WaterLayer } from "./types";
 
 /** No placeholder data: a new scenario shows a loading state, never the previous scenario's numbers. */
 export function useFocus(returnPeriod: number) {
@@ -15,6 +15,13 @@ export function useOverlay(returnPeriod: number, enabled: boolean) {
     queryKey: ["overlay", returnPeriod],
     queryFn: ({ signal }) => getJson<OverlayInfo>("/hazard/overlay", { return_period: returnPeriod }, signal),
     enabled,
+  });
+}
+
+export function useWater() {
+  return useQuery({
+    queryKey: ["water"],
+    queryFn: ({ signal }) => getJson<WaterLayer>("/hazard/water", undefined, signal),
   });
 }
 

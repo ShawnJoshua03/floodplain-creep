@@ -9,8 +9,12 @@ import numpy as np
 import numpy.typing as npt
 import rasterio
 from PIL import Image
+from pyproj import Transformer
+from rasterio.features import shapes
 from rasterio.transform import from_bounds
 from rasterio.warp import Resampling, reproject, transform_bounds
+from shapely.geometry import box, mapping, shape
+from shapely.ops import transform, unary_union
 
 from pipeline.io.flood_grid import DEPTH_NODATA, MASK_NODATA
 from pipeline.lib.exposure import flood_zone
@@ -18,6 +22,8 @@ from pipeline.lib.overlay import DEPTH_BINS, colorize
 
 WEB_MERCATOR = "EPSG:3857"
 PIXEL_M = 100.0
+WATER_SIMPLIFY_M = 40.0
+WATER_SOURCE = "JRC permanent water, about 90 m. A river or lake that is water all year."
 
 
 def warp_to_mercator(
@@ -60,3 +66,23 @@ def write_manifest(out_dir: Path, lonlat_bbox: list[float], images: dict[int, st
         "images": {str(return_period): name for return_period, name in images.items()},
     }
     (out_dir / "overlays.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+
+def water_geometry(water_path: Path, lonlat_bbox: list[float]) -> dict[str, object] | None:
+    """Permanent water as one polygon in lon/lat, for orientation on the map. No buildings, no cells exposed."""
+    left, bottom, right, top = transform_bounds("EPSG:4326", WEB_MERCATOR, *lonlat_bbox)
+    mask = np.asarray(warp_to_mercator(water_path, lonlat_bbox, "uint8", MASK_NODATA), dtype=np.uint8) != MASK_NODATA
+    if not mask.any():
+        return None
+    height, width = mask.shape
+    frame = from_bounds(left, bottom, right, top, width, height)
+    pieces = [shape(geometry) for geometry, value in shapes(mask.astype(np.uint8), mask=mask, transform=frame) if value]
+    merged = unary_union(pieces).simplify(WATER_SIMPLIFY_M).intersection(box(left, bottom, right, top))
+    to_lonlat = Transformer.from_crs(WEB_MERCATOR, "EPSG:4326", always_xy=True).transform
+    geometry = mapping(transform(to_lonlat, merged))
+    return {"type": geometry["type"], "coordinates": json.loads(json.dumps(geometry["coordinates"]))}
+
+
+def write_context(out_dir: Path, water: dict[str, object] | None) -> None:
+    context = {"label": WATER_SOURCE, "water": water}
+    (out_dir / "context.json").write_text(json.dumps(context) + "\n", encoding="utf-8")

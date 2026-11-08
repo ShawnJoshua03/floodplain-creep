@@ -38,6 +38,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/hazard/water": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Water */
+        get: operations["get_water_hazard_water_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/overlays/{filename}": {
         parameters: {
             query?: never;
@@ -244,6 +261,8 @@ export interface components {
             name: string;
             /** Boundary Source */
             boundary_source: string;
+            /** Coverage */
+            coverage: number;
             /** Geometry */
             geometry: components["schemas"]["PolygonGeometry"] | components["schemas"]["MultiPolygonGeometry"];
         };
@@ -352,6 +371,16 @@ export interface components {
              */
             created_at: string;
         };
+        /**
+         * WaterLayer
+         * @description Permanent water, for orientation on the map. It holds no buildings.
+         */
+        WaterLayer: {
+            /** Label */
+            label: string;
+            /** Geometry */
+            geometry: components["schemas"]["MultiPolygonGeometry"] | components["schemas"]["PolygonGeometry"] | null;
+        };
     };
     responses: never;
     parameters: never;
@@ -419,6 +448,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_water_hazard_water_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WaterLayer"];
                 };
             };
         };
