@@ -3,7 +3,7 @@
 # against that tool's current docs and create the config files so every target passes.
 PY := uv run
 
-.PHONY: check py-check web-check repo-check design-check types
+.PHONY: check py-check web-check repo-check design-check types serve-api serve-web
 
 check: py-check web-check repo-check design-check
 
@@ -32,3 +32,10 @@ design-check:
 types:
 	$(PY) python scripts/dump_openapi.py web/openapi.json
 	npm --prefix web run generate:types
+
+# Run the app locally in two terminals. The web server proxies API paths to port 8000.
+serve-api:
+	$(PY) --env-file .env python -m api.serve
+
+serve-web:
+	npm --prefix web run dev
