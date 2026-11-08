@@ -3,10 +3,358 @@
  * Do not make direct changes to the file.
  */
 
-export type paths = Record<string, never>;
+export interface paths {
+    "/city/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get City Summary */
+        get: operations["get_city_summary_city_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/neighborhoods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Neighborhoods */
+        get: operations["get_neighborhoods_neighborhoods_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/hazard/overlay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Overlay */
+        get: operations["get_overlay_hazard_overlay_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/overlays/{filename}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Overlay Image */
+        get: operations["get_overlay_image_overlays__filename__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/validation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Validation */
+        get: operations["get_validation_validation_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/brief/{neighborhood_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Brief */
+        get: operations["get_brief_brief__neighborhood_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/limits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Limits */
+        get: operations["get_limits_limits_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+}
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: never;
+    schemas: {
+        /** Brief */
+        Brief: {
+            /** Neighborhood Id */
+            neighborhood_id: string;
+            /** Return Period */
+            return_period: number;
+            /** Text */
+            text: string;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "gemini" | "template";
+        };
+        /** CitySummary */
+        CitySummary: {
+            /** City */
+            city: string;
+            /** Return Period */
+            return_period: number;
+            /** First Year */
+            first_year: number;
+            /** Last Year */
+            last_year: number;
+            /** Years */
+            years: components["schemas"]["CityYear"][];
+        };
+        /**
+         * CityYear
+         * @description Totals over the neighborhoods that are shown. Suppressed neighborhoods are counted, not summed.
+         */
+        CityYear: {
+            /** Year */
+            year: number;
+            /** Buildings In Zone */
+            buildings_in_zone: number;
+            /** New Buildings In Zone */
+            new_buildings_in_zone: number | null;
+            /** Neighborhoods Shown */
+            neighborhoods_shown: number;
+            /** Neighborhoods Suppressed */
+            neighborhoods_suppressed: number;
+        };
+        /** Confusion */
+        Confusion: {
+            /** Tp */
+            tp: number;
+            /** Fp */
+            fp: number;
+            /** Fn */
+            fn: number;
+            /** Tn */
+            tn: number;
+        };
+        /** DepthBin */
+        DepthBin: {
+            /** Min Depth M */
+            min_depth_m: number;
+            /** Max Depth M */
+            max_depth_m: number | null;
+            /** Color */
+            color: string;
+        };
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
+        };
+        /** Interval */
+        Interval: {
+            /** Value */
+            value: number | null;
+            /** Low */
+            low: number | null;
+            /** High */
+            high: number | null;
+            /** N */
+            n: number;
+        };
+        /** LabelSources */
+        LabelSources: {
+            /** Human */
+            human: number;
+            /** Audit */
+            audit: number;
+            /** Ai */
+            ai: number;
+        };
+        /** Limits */
+        Limits: {
+            /** Limits */
+            limits: string[];
+            /** Misuse Notice */
+            misuse_notice: string;
+            /** Banned Terms */
+            banned_terms: string[];
+        };
+        /** MultiPolygonGeometry */
+        MultiPolygonGeometry: {
+            /**
+             * Type
+             * @constant
+             */
+            type: "MultiPolygon";
+            /** Coordinates */
+            coordinates: number[][][][];
+        };
+        /** NeighborhoodCollection */
+        NeighborhoodCollection: {
+            /**
+             * Type
+             * @default FeatureCollection
+             * @constant
+             */
+            type: "FeatureCollection";
+            /** Year */
+            year: number;
+            /** Return Period */
+            return_period: number;
+            /** Features */
+            features: components["schemas"]["NeighborhoodFeature"][];
+        };
+        /** NeighborhoodFeature */
+        NeighborhoodFeature: {
+            /**
+             * Type
+             * @default Feature
+             * @constant
+             */
+            type: "Feature";
+            properties: components["schemas"]["NeighborhoodProperties"];
+            /** Geometry */
+            geometry: components["schemas"]["PolygonGeometry"] | components["schemas"]["MultiPolygonGeometry"];
+        };
+        /** NeighborhoodProperties */
+        NeighborhoodProperties: {
+            /** Buildings In Zone */
+            buildings_in_zone: number | null;
+            /** New Buildings In Zone */
+            new_buildings_in_zone: number | null;
+            /** Growth Pct */
+            growth_pct: number | null;
+            /** Suppressed */
+            suppressed: boolean;
+            /** Change Available */
+            change_available: boolean;
+            /** Neighborhood Id */
+            neighborhood_id: string;
+            /** Name */
+            name: string;
+            /** Year */
+            year: number;
+            /** Return Period */
+            return_period: number;
+            /** Boundary Source */
+            boundary_source: string;
+        };
+        /** OverlayInfo */
+        OverlayInfo: {
+            /** Return Period */
+            return_period: number;
+            /** Image Url */
+            image_url: string;
+            /** Bounds */
+            bounds: number[];
+            /** Bins */
+            bins: components["schemas"]["DepthBin"][];
+            /** Label */
+            label: string;
+        };
+        /** PolygonGeometry */
+        PolygonGeometry: {
+            /**
+             * Type
+             * @constant
+             */
+            type: "Polygon";
+            /** Coordinates */
+            coordinates: number[][][];
+        };
+        /** ValidationError */
+        ValidationError: {
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
+            /** Input */
+            input?: unknown;
+            /** Context */
+            ctx?: Record<string, never>;
+        };
+        /** ValidationResult */
+        ValidationResult: {
+            /** Labeled Cells */
+            labeled_cells: number;
+            /** Excluded Unclear */
+            excluded_unclear: number;
+            /** Tuning Cells */
+            tuning_cells: number;
+            /** Test Cells */
+            test_cells: number;
+            /** Change Threshold Buildings */
+            change_threshold_buildings: number;
+            confusion: components["schemas"]["Confusion"];
+            accuracy: components["schemas"]["Interval"];
+            precision: components["schemas"]["Interval"];
+            recall: components["schemas"]["Interval"];
+            /** Sampling Note */
+            sampling_note: string;
+            label_sources: components["schemas"]["LabelSources"];
+            ai_human_agreement: components["schemas"]["Interval"];
+            /** Imagery Source */
+            imagery_source: string;
+            /** Imagery Dates */
+            imagery_dates: string;
+            /** Start Year */
+            start_year: number;
+            /** End Year */
+            end_year: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+    };
     responses: never;
     parameters: never;
     requestBodies: never;
@@ -14,4 +362,201 @@ export interface components {
     pathItems: never;
 }
 export type $defs = Record<string, never>;
-export type operations = Record<string, never>;
+export interface operations {
+    get_city_summary_city_summary_get: {
+        parameters: {
+            query?: {
+                return_period?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CitySummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_neighborhoods_neighborhoods_get: {
+        parameters: {
+            query?: {
+                return_period?: number;
+                year?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NeighborhoodCollection"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_overlay_hazard_overlay_get: {
+        parameters: {
+            query?: {
+                return_period?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OverlayInfo"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_overlay_image_overlays__filename__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                filename: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_validation_validation_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationResult"];
+                };
+            };
+        };
+    };
+    get_brief_brief__neighborhood_id__get: {
+        parameters: {
+            query?: {
+                return_period?: number;
+            };
+            header?: never;
+            path: {
+                neighborhood_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Brief"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_limits_limits_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Limits"];
+                };
+            };
+        };
+    };
+}

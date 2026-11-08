@@ -116,3 +116,11 @@ None yet.
 - Reading: building-count change in a single 100 m cell is a weak signal of a visible new building. Roughly half to two thirds of cells the algorithm calls an increase show no new building in the imagery. Cell-level noise partly averages out in neighborhood totals, but this test does not measure that.
 - Caveats: labels come from one AI reviewer and are not audited. 78 low-confidence labels sit mostly in dense areas where infill is easy to miss, which would lower measured precision. Precision and recall describe an oversampled sample. Do not publish these numbers. The audit sheet (30 cells) is the next check.
 - Consequence for the product: the accuracy card must show these numbers as they are once audited. Copy must say that counts describe modeled building density and are least reliable cell by cell, and that growth is shown by neighborhood only. Rule 5 stands: nothing about accuracy is hardcoded.
+
+## M5 API choices
+- Settings: `api/core/settings.py` is the one settings object. It reads `DATABASE_URL`, `config/city.yaml`, `config/banned_terms.txt`, `config/misuse_notice.txt` and the new `config/limits.txt`. It does not import from `pipeline/io`.
+- Limits text lives in `config/limits.txt`, one limit per line. It avoids the banned words on purpose. The misuse notice, which is exempt, carries the plain statement about evictions and enforcement. The UI must show both.
+- City summary: totals sum only the neighborhoods that are shown. Suppressed neighborhoods are counted (`neighborhoods_suppressed`), never summed, so the total is a floor. The UI must say so.
+- Brief: `GET /brief/{id}` returns a stored brief only. A missing brief is a 404. Generation and the templated fallback arrive in M7. A stored brief that holds a banned term is logged and not served.
+- Overlay: `render_overlays.py` draws JRC depth in Web Mercator at 100 m, using the same flood-zone rule as the grid (minimum depth, no permanent water, no spurious depth). Images and `overlays.json` go to `data/processed/overlays/`. The API serves only files named in the manifest. The overlay is a hazard layer and holds no building data.
+- Validation: `GET /validation` returns the stored payload and `label_sources`, so the UI can say when labels are AI-made and not audited.

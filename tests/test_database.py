@@ -1,18 +1,13 @@
 import json
 import re
-import uuid
-from collections.abc import Iterator
 from pathlib import Path
 
 import psycopg
 import pytest
-from pgserver.postgres_server import get_server
 
 from pipeline.io.city_config import load_city_config
 from pipeline.io.database import (
     add_validation_result,
-    apply_schema,
-    connect,
     load_neighborhoods,
     replace_exposure,
 )
@@ -21,25 +16,6 @@ from pipeline.lib.aggregation import ZoneTotal
 from pipeline.lib.suppression import ExposureRow, apply_suppression
 
 CELL_LEVEL_WORDS = {"cell", "row", "col", "lat", "lon", "latitude", "longitude", "x", "y"}
-
-
-@pytest.fixture(scope="session")
-def database_url(tmp_path_factory: pytest.TempPathFactory) -> Iterator[str]:
-    server = get_server(tmp_path_factory.mktemp("postgres"))
-    yield server.get_uri()
-    server.cleanup()
-
-
-@pytest.fixture
-def conn(database_url: str) -> Iterator[psycopg.Connection]:
-    name = f"test_{uuid.uuid4().hex[:10]}"
-    connection = connect(database_url, name)
-    apply_schema(connection)
-    yield connection
-    connection.rollback()
-    connection.execute(f'DROP SCHEMA "{name}" CASCADE')
-    connection.commit()
-    connection.close()
 
 
 def write_geojson(path: Path) -> None:

@@ -1,0 +1,9 @@
+Data covers 2018 to 2023. 2016 and 2017 are not used because building detections are unstable.
+Building detections can change between years without any real change on the ground.
+Building counts are relative estimates from satellite data, not exact counts.
+The flood layer shows river flooding only, at a resolution of about 90 m.
+The modeled flood zone is wide because shallow depths on a coarse grid count as flooded.
+Flood scenarios are simulated. They are not a forecast.
+Results are shown by neighborhood. Neighborhoods with too few buildings show "not enough data".
+This is not an official warning.
+This is not for enforcement against residents. See the misuse notice.

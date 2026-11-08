@@ -4,5 +4,905 @@
     "title": "Floodplain Creep",
     "version": "0.1.0"
   },
-  "paths": {}
+  "paths": {
+    "/city/summary": {
+      "get": {
+        "summary": "Get City Summary",
+        "operationId": "get_city_summary_city_summary_get",
+        "parameters": [
+          {
+            "name": "return_period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 100,
+              "title": "Return Period"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CitySummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/neighborhoods": {
+      "get": {
+        "summary": "Get Neighborhoods",
+        "operationId": "get_neighborhoods_neighborhoods_get",
+        "parameters": [
+          {
+            "name": "return_period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 100,
+              "title": "Return Period"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 2023,
+              "title": "Year"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NeighborhoodCollection"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hazard/overlay": {
+      "get": {
+        "summary": "Get Overlay",
+        "operationId": "get_overlay_hazard_overlay_get",
+        "parameters": [
+          {
+            "name": "return_period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 100,
+              "title": "Return Period"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverlayInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/overlays/{filename}": {
+      "get": {
+        "summary": "Get Overlay Image",
+        "operationId": "get_overlay_image_overlays__filename__get",
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Filename"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/validation": {
+      "get": {
+        "summary": "Get Validation",
+        "operationId": "get_validation_validation_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/brief/{neighborhood_id}": {
+      "get": {
+        "summary": "Get Brief",
+        "operationId": "get_brief_brief__neighborhood_id__get",
+        "parameters": [
+          {
+            "name": "neighborhood_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Neighborhood Id"
+            }
+          },
+          {
+            "name": "return_period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 100,
+              "title": "Return Period"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Brief"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/limits": {
+      "get": {
+        "summary": "Get Limits",
+        "operationId": "get_limits_limits_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Limits"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Brief": {
+        "properties": {
+          "neighborhood_id": {
+            "type": "string",
+            "title": "Neighborhood Id"
+          },
+          "return_period": {
+            "type": "integer",
+            "title": "Return Period"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "gemini",
+              "template"
+            ],
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "neighborhood_id",
+          "return_period",
+          "text",
+          "source"
+        ],
+        "title": "Brief"
+      },
+      "CitySummary": {
+        "properties": {
+          "city": {
+            "type": "string",
+            "title": "City"
+          },
+          "return_period": {
+            "type": "integer",
+            "title": "Return Period"
+          },
+          "first_year": {
+            "type": "integer",
+            "title": "First Year"
+          },
+          "last_year": {
+            "type": "integer",
+            "title": "Last Year"
+          },
+          "years": {
+            "items": {
+              "$ref": "#/components/schemas/CityYear"
+            },
+            "type": "array",
+            "title": "Years"
+          }
+        },
+        "type": "object",
+        "required": [
+          "city",
+          "return_period",
+          "first_year",
+          "last_year",
+          "years"
+        ],
+        "title": "CitySummary"
+      },
+      "CityYear": {
+        "properties": {
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "buildings_in_zone": {
+            "type": "integer",
+            "title": "Buildings In Zone"
+          },
+          "new_buildings_in_zone": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Buildings In Zone"
+          },
+          "neighborhoods_shown": {
+            "type": "integer",
+            "title": "Neighborhoods Shown"
+          },
+          "neighborhoods_suppressed": {
+            "type": "integer",
+            "title": "Neighborhoods Suppressed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "year",
+          "buildings_in_zone",
+          "new_buildings_in_zone",
+          "neighborhoods_shown",
+          "neighborhoods_suppressed"
+        ],
+        "title": "CityYear",
+        "description": "Totals over the neighborhoods that are shown. Suppressed neighborhoods are counted, not summed."
+      },
+      "Confusion": {
+        "properties": {
+          "tp": {
+            "type": "integer",
+            "title": "Tp"
+          },
+          "fp": {
+            "type": "integer",
+            "title": "Fp"
+          },
+          "fn": {
+            "type": "integer",
+            "title": "Fn"
+          },
+          "tn": {
+            "type": "integer",
+            "title": "Tn"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tp",
+          "fp",
+          "fn",
+          "tn"
+        ],
+        "title": "Confusion"
+      },
+      "DepthBin": {
+        "properties": {
+          "min_depth_m": {
+            "type": "number",
+            "title": "Min Depth M"
+          },
+          "max_depth_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Depth M"
+          },
+          "color": {
+            "type": "string",
+            "title": "Color"
+          }
+        },
+        "type": "object",
+        "required": [
+          "min_depth_m",
+          "max_depth_m",
+          "color"
+        ],
+        "title": "DepthBin"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Interval": {
+        "properties": {
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Low"
+          },
+          "high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "High"
+          },
+          "n": {
+            "type": "integer",
+            "title": "N"
+          }
+        },
+        "type": "object",
+        "required": [
+          "value",
+          "low",
+          "high",
+          "n"
+        ],
+        "title": "Interval"
+      },
+      "LabelSources": {
+        "properties": {
+          "human": {
+            "type": "integer",
+            "title": "Human"
+          },
+          "audit": {
+            "type": "integer",
+            "title": "Audit"
+          },
+          "ai": {
+            "type": "integer",
+            "title": "Ai"
+          }
+        },
+        "type": "object",
+        "required": [
+          "human",
+          "audit",
+          "ai"
+        ],
+        "title": "LabelSources"
+      },
+      "Limits": {
+        "properties": {
+          "limits": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Limits"
+          },
+          "misuse_notice": {
+            "type": "string",
+            "title": "Misuse Notice"
+          },
+          "banned_terms": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Banned Terms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "limits",
+          "misuse_notice",
+          "banned_terms"
+        ],
+        "title": "Limits"
+      },
+      "MultiPolygonGeometry": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "MultiPolygon",
+            "title": "Type"
+          },
+          "coordinates": {
+            "items": {
+              "items": {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Coordinates"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "coordinates"
+        ],
+        "title": "MultiPolygonGeometry"
+      },
+      "NeighborhoodCollection": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "FeatureCollection",
+            "title": "Type",
+            "default": "FeatureCollection"
+          },
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "return_period": {
+            "type": "integer",
+            "title": "Return Period"
+          },
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/NeighborhoodFeature"
+            },
+            "type": "array",
+            "title": "Features"
+          }
+        },
+        "type": "object",
+        "required": [
+          "year",
+          "return_period",
+          "features"
+        ],
+        "title": "NeighborhoodCollection"
+      },
+      "NeighborhoodFeature": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "Feature",
+            "title": "Type",
+            "default": "Feature"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/NeighborhoodProperties"
+          },
+          "geometry": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PolygonGeometry"
+              },
+              {
+                "$ref": "#/components/schemas/MultiPolygonGeometry"
+              }
+            ],
+            "title": "Geometry"
+          }
+        },
+        "type": "object",
+        "required": [
+          "properties",
+          "geometry"
+        ],
+        "title": "NeighborhoodFeature"
+      },
+      "NeighborhoodProperties": {
+        "properties": {
+          "buildings_in_zone": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Buildings In Zone"
+          },
+          "new_buildings_in_zone": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Buildings In Zone"
+          },
+          "growth_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Growth Pct"
+          },
+          "suppressed": {
+            "type": "boolean",
+            "title": "Suppressed"
+          },
+          "change_available": {
+            "type": "boolean",
+            "title": "Change Available"
+          },
+          "neighborhood_id": {
+            "type": "string",
+            "title": "Neighborhood Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "return_period": {
+            "type": "integer",
+            "title": "Return Period"
+          },
+          "boundary_source": {
+            "type": "string",
+            "title": "Boundary Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "buildings_in_zone",
+          "new_buildings_in_zone",
+          "growth_pct",
+          "suppressed",
+          "change_available",
+          "neighborhood_id",
+          "name",
+          "year",
+          "return_period",
+          "boundary_source"
+        ],
+        "title": "NeighborhoodProperties"
+      },
+      "OverlayInfo": {
+        "properties": {
+          "return_period": {
+            "type": "integer",
+            "title": "Return Period"
+          },
+          "image_url": {
+            "type": "string",
+            "title": "Image Url"
+          },
+          "bounds": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Bounds"
+          },
+          "bins": {
+            "items": {
+              "$ref": "#/components/schemas/DepthBin"
+            },
+            "type": "array",
+            "title": "Bins"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "return_period",
+          "image_url",
+          "bounds",
+          "bins",
+          "label"
+        ],
+        "title": "OverlayInfo"
+      },
+      "PolygonGeometry": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "Polygon",
+            "title": "Type"
+          },
+          "coordinates": {
+            "items": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Coordinates"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "coordinates"
+        ],
+        "title": "PolygonGeometry"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "ValidationResult": {
+        "properties": {
+          "labeled_cells": {
+            "type": "integer",
+            "title": "Labeled Cells"
+          },
+          "excluded_unclear": {
+            "type": "integer",
+            "title": "Excluded Unclear"
+          },
+          "tuning_cells": {
+            "type": "integer",
+            "title": "Tuning Cells"
+          },
+          "test_cells": {
+            "type": "integer",
+            "title": "Test Cells"
+          },
+          "change_threshold_buildings": {
+            "type": "number",
+            "title": "Change Threshold Buildings"
+          },
+          "confusion": {
+            "$ref": "#/components/schemas/Confusion"
+          },
+          "accuracy": {
+            "$ref": "#/components/schemas/Interval"
+          },
+          "precision": {
+            "$ref": "#/components/schemas/Interval"
+          },
+          "recall": {
+            "$ref": "#/components/schemas/Interval"
+          },
+          "sampling_note": {
+            "type": "string",
+            "title": "Sampling Note"
+          },
+          "label_sources": {
+            "$ref": "#/components/schemas/LabelSources"
+          },
+          "ai_human_agreement": {
+            "$ref": "#/components/schemas/Interval"
+          },
+          "imagery_source": {
+            "type": "string",
+            "title": "Imagery Source"
+          },
+          "imagery_dates": {
+            "type": "string",
+            "title": "Imagery Dates"
+          },
+          "start_year": {
+            "type": "integer",
+            "title": "Start Year"
+          },
+          "end_year": {
+            "type": "integer",
+            "title": "End Year"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "labeled_cells",
+          "excluded_unclear",
+          "tuning_cells",
+          "test_cells",
+          "change_threshold_buildings",
+          "confusion",
+          "accuracy",
+          "precision",
+          "recall",
+          "sampling_note",
+          "label_sources",
+          "ai_human_agreement",
+          "imagery_source",
+          "imagery_dates",
+          "start_year",
+          "end_year",
+          "created_at"
+        ],
+        "title": "ValidationResult"
+      }
+    }
+  }
 }
